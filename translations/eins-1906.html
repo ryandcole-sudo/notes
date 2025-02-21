@@ -1,0 +1,257 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width,                                        maximum-scale=1.0, user-scalable=yes">
+		<title> Planck's Radiation Theory and the Theory of Specific Heats - Albert Einstein </title>
+		<link rel="stylesheet" href="js/katex.min.css" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="js/katex.min.js" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="js/auto-render.js" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+	</head> 
+	<body>
+<h1> Planck's Radiation Theory and the Theory of Specific Heats </h1>
+<strong> By Albert Einstein </strong>
+
+<p>
+In two previous papers,<a href="#ref_1"><sup>[1]</sup></a> I have shown that the interpretation of the energy distribution law for black radiation in the sense of Boltzmann's theory of the second law of thermodynamics leads us to a new conception of the phenomena of light emission and absorption, that certainly in no way possesses the character of a complete theory, but is insofar remarkable in that it simplifies our understanding of a range of physical phenomena. In the present work, we shall attempt to understand the theory of radiation &mdash; and especially Planck's theory &mdash; as it leads to a modification of the molecular-kinetic theory of heat, by which we will be able to remove certain difficulties, that have until now stood in our way of achieving a complete theory. It also gives us new connections between the thermal and optical behavior of solid bodies.
+</p>
+<hr/>
+<p>
+ We will start by giving the deduction for the average energy of the <em>Planck Resonator</em>, whose relation to molecular mechanics shall soon become clear.
+<p/>
+We will make use of some general results from the molecular theory of heat<a href="#ref_1"><sup>[1]</sup></a>. Consider that the state of a system in the sense of molecular theory is determined by (very many) variables <math> P_1 </math>, <math>P_2</math>, <math>... P_n</math>. The course of a molecular process is determined by the following equation: 
+</p>
+<div class="math">
+<math>
+\frac{dP_\nu}{dt} = \Phi_\nu(P_1,P_2,...,P_n),  
+(v = 1,2,3...n)
+</math>
+</div>
+
+<p>
+and the following relation holds for all values of <math>P_\nu</math>
+</p>
+
+<div class="math" id="eq_1">
+	<math>
+ \[	\sum \frac_{\partial \Phi_\nu}{\partial P_\nu} = 0 \]
+	</math>
+</div>
+
+<p>
+It is furthermore a subsystem of the system <math>P_\nu</math> determined through the variables <math>p_1...p_n</math> (which belongs to <math>P_\nu</math>), and it is assumed that the energy of the whole system, to a good approximation, can be thought of as being composed of only two parts, one of which depends only on <math>p_1...p_m</math>, while the other is independent of <math>p_1...p_m</math>. Furthermore \( E \) is infinitely small compared to the energy of the whole system.
+</p>
+
+<p>
+The probability \( dW \) that at a randomly chosen point in time, \( p_\nu \) is found to be in the infinitesimally small region \( (dp_1,dp_2...dp_n) \) is given by the following equation: <a href="ref3">[1]</a>. 
+</p>
+
+<div class="math" id="eq_2">
+	dW = Ce^{-\frac{N}{RT}E}dp_1...dp_m
+</div>
+
+<p>
+ Where \(C\) is a function of the absolute temperature (\(T\)).\(N\) is the number of particles in a gram equivalent.\(R\) is the constant of the gas equation for a gram-mole.
+</p>
+<p> We can write</p>
+
+<div class="math" id="eq_3">
+	\int\limits_{dE} dp_1 \ldots dp_m = \omega(E) dE
+</div>
+
+
+<p>
+where the integral ranges over all the combinations of \(p_\nu\), that correspond to values of energy between \(E\) and \( E+dE \), we thus obtain 
+</p>
+
+<div class="math">
+	dW = Ce^{-\frac N{RT}E} \omega(E)dE
+</div>
+
+<p>
+If we set the variable \(P_\nu \) in the center-of-mass coordinates, and the component of the velocity of of the point masses (atoms,electrons). And we assume the accelerations depend only on the coordinates, and not on the velocity, we arrive at the molecular-kinetic theory of heat. Relation (<a href="#eq_1">1</a>) is fulfilled here, and equation (<a href="#eq_2">2</a>) also applies.
+</p>
+
+<p>
+ If we think of it specifically as a system of \(p_\nu\) elementary mass particles, which are able to perform sinusoidal oscillations along a straight line, and it is denoted by \(x\), and \( \xi\) denotes the instantaneous distance from the equilibrium position, and the velocity of the same, then we obtain
+</p>
+<div class="math">
+\[	dW = Ce^{-\frac N{RT}E}dx d\xi \]
+
+</div>
+
+<p>
+and, since \( \int dx d\xi = \mathrm{const.}dE\) it follows that \( \omega = \mathrm{const.}\) to be determined<sup><a href="#ref4">[4]</a></sup>:
+</p>
+
+<div class="math">
+	\[
+	dW = Ce^{-\frac N{RT}E }dE
+	\]
+</div>
+
+<p> The average energy of the particle is therefore:
+
+<div class="math" id="eq_4">
+	\[ \bar{E} = \frac{\int E e^{-\frac N{RT}E} dE}{\int e^{-\frac N{RT}E dE } } = \frac{RT}N \]
+</div>
+
+<p>
+Equation (<a href="#eq_4">4</a>) can obviously also be applied to a rectilinear oscillating ion. If we do this, and take into consideration the relation between the average energy and density of the black radiation for the relevant frequency, as per the investigations of Planck<sup><a href="#ref_4">[4]</a></sup> we get the Formula.
+</p>
+
+<div class="math" id="eq_5">
+ \[ 
+  \bar{E}_\nu = \frac{L^3}{8\pi\nu^2}\varrho_\nu
+ \]
+</div>
+
+<p> then by elimination of \(E\) from equation (<a href="#eq_4">4</a>) and (<a href="#eq_5">5</a>), we arrive at <em>Rayleigh's Formula</em>
+
+<div class="math" id="eq_5">
+	\[
+	\rho_\nu = \frac RN \frac{8\pi\nu^2}{L^3} 
+	\]
+</div>
+<p>
+which, as is well known, is only true in the limit of large values of \( \frac T\nu \).
+</p>
+
+<p>
+In order to arrive at Planck's theory of black radiation, we can do as follows. We keep equation (<a href="#eq_5">5</a>), and therefore assume that Maxwell's theory of electricity correctly determines the relationship between the density of the radiation and \(bar{E}\). One the other hand, we abandon equation (<a href="#eq_4">4</a>),i.e we suppose that the application of the molecular-kinetic theory leads to a contradiction with experience. We will however stick with equations (<a href="#eq_2">2</a>) and (<a href="#eq_3">3</a>) from the general molecular theory of heat. Instead of assuming, in accordance with the molecular-kinetic theory, that we can set
+</p>
+<div class="math">
+	\omega = \mathrm{const}
+</div>
+<p>
+ We will instead set \( \omega = 0\) for all values of \(E\), that are not exceptionally close to \(0\), \(\epsilon\), \(2\epsilon\), \(3\epsilon\) etc. Only between \(0\) and \(0 +\alpha\), \(\epsilon\) and \(\epsilon + \alpha\), \(2\epsilon\) and \(2\epsilon + \alpha\) etc (where \(\alpha\) is infinitely small compared to \(\epsilon\) ) can be non-zero, so that 
+</p>
+<div class="math">
+	\[
+	\int\limits_0^\alpha \omega dE = \int_limits_{\epsilon}^{\epsilon + \alpha} \omega dE + \int_\limits^{2\epsilon + \alpha} \omega dE = \ldots =A
+	\]
+</div>
+
+<p> This deduction involves, as can be seen from equation (<a href="#eq_3">3</a>), the assumption that the energy of the basic elements under consideration, only accept values that are infinitely close to \(0\) , \(\epsilon\), (2\epsilon\) etc.  </p>  
+
+<p>
+ Using the deduction presented for \( \omega\),we obtain with the help of (<a href="#eq_3">3</a>):
+</p>
+
+<div class="math">
+	\[
+	\bar{E} = \frac{\int E e^{-\frac N{RT}E} \omega(E) dE }{\int e^{-\frac N{RT}E} \omega(E) dE } = \frac{0 + A\epsilon e^{-\frac N{RT}\epsilon} + A.2\epsilon e^{-\frac N{RT} 2\epsilon \ldots}}{0 + A e^{-\frac N{RT} \epsilon} + A e^{-\frac N{RT} 2\epsilon} }
+	\]
+</div>
+
+<p>
+If we also set \( \epsilon = \frac RN\beta\nu \) (in accordance with the quantum hypothesis) we obtain:
+</p>
+<div class="math" id="eq_7">
+ \[
+ \bar{E} = \frac{\frac RN\beta\nu}{ e^{\frac{\beta\nu}T} - 1}
+ \]
+</div>
+<p>
+ And with the help of (<a href="#eq_5">5</a>) Planck's radiation formula:
+</p>
+<div class="math">
+	\varrho_\nu = \frac{8\pi}{L^3} \cdot \frac{R\beta}N \frac{\nu^3}{e^{ \frac{\beta\nu}{T}} -1}
+</div>
+<p>
+Equation (<a href="#eq_7">7</a>) gives the dependence of the average energy of the Planck resonators on temperature.
+</p>
+<hr/>
+
+<p> 
+From the preceding it becomes clear in what sense the molecular-kinetic theory of heat must be modified in order to to be reconciled with the law of the distribution of black radiation. Up until this point, the molecular motions have been subject to the same laws which are valid for bodies in the world of our experience (we add only the postulate of complete reversibility). We are now forced to be more specific, for ions capable of vibrating with a certain frequency, the exchange of energy between matter and radiation can be used to make the assumption that the diversity of states that they can assume are less than those of bodies in our experience. We have to assume that mechanisms of energy transfer from the basic elements can only assume only the values \(0\), \( \frac RN\beta\nu\), \( 2\frac RN\beta\nu \) etc.<sup><a href="#ref_7">[7]</a></sup>
+</p>
+<p>
+I now think that we should not be satisfied with this result that we have gotten. Namely, the question arises, if the theory of the transfer of energy between radiation and matter is such that [anzunehmenden] the basic elements are not to be understood in terms of the present molecular-kinetic theory, must we then not also modify the theory for other periodically vibrating elements, that the molecular theory of heat considers? The answer, in my opinion, is not in doubt. If Planck's theory of radiation strikes at the heart of the matter, we should therefore expect to find other areas of heat theory having contradiction between the present molecular-kinetic theory and experiments, that can be removed by the path taken. In my opinion this is indeed the case, as I will attempt to show in the following. 
+</p>
+<hr/>
+
+<p>
+The simplest way we can think of the motion of heat in solid bodies is to imagine individual atoms of the same sinusoidal oscillation vibrating around equilibrium position. Under this assumption one obtains,by applying the molecular-kinetic theory (equation (<a href="#eq_4">4</a>)), and taking into account the fact that every atom has three degrees of freedom of movement, the specific heat for a gram-equivalent.
+</p>
+<div class="math">
+	\[
+	c = 3Rn
+	\]
+</div>
+<p>or &mdash; expressed in gram calories &mdash;</p>
+<div class="math">
+	\[
+	c =5.94n
+	\]
+</div>
+<p> Where \(n\) denotes the number of atoms in a molecule. It is known that this relationship holds for most elements and for many compounds in the solid state with remarkable accuracy (Dulong-Petit law, rule of F.Neumann and Kopp).
+</p>
+<p>
+But if we look more closely at the facts, we encounter two difficulties, that seem to draw narrow limits on the applicability of molecular theory.
+</p>
+
+<ol>
+ <li> 
+	 <p>There are elements(such as boron,carbon and silicon), which in the solid state at ordinary temperature have atomic specific heat much smaller than \(5.94\). Furthermore all compounds containing hydrogen, oxygen or at least one of the substance just mentioned, have specific heat per gram-mole much smaller than \(5.94\)</p></li>
+ <li><p>
+	 Mr.Drude has shown<sup><a href="#ref_8">[8]</a></sup> that the optical phenomena (dispersion) leads to the conclusion that each atom of a compound can be ascribed several elementary masses moving independently of each other, by successfully using the infrared natural frequency of the vibration of the atom(atomic ions) to attribute ultraviolet natural frequencies of vibrations the electrons. From this follows a second important difficulty for the molecular-kinetic theory of heat, in that the specific heat &mdash; since the number of moving mass points per molecule is greater than number of atoms &mdash; would have to exceed the value of \(5.94\) considerably.
+	 </p></li>
+</ol>
+
+<p>
+From the above , the following should be noted in this regard. When we treat the carriers of heat in solid bodies as periodically vibrating elements, whose frequency is independent of its vibrational energy. We may, from Planck's theory of radiation, not expect that the specific heat will always have the value of \(5.94\). On the contrary, we have to set (<a href="#eq_7">7</a>).
+<div class="math">
+	\bar{E} = \frac{3R}{N} \frac{\beta\nu}{e^{\frac{\beta\nu}T} -1}
+</div>
+</p>
+
+<p>
+The energy of \(N\) such basic elements, measured in gram calories therefore has the value 
+</p>
+
+<div class="math">
+ \bar{E} = 5.94 \frac{\beta\nu}{e^{
+\frac{\beta\nu}T} -1}
+</div>
+<p>
+So that each basic vibrating element contributes the following value to the specific heat per gram equivalent:
+</p>
+<div class="math" id="eq_8">
+	\[
+	5.94 \frac{e^{\frac{\beta\nu}T} \cdot \left( \frac{\beta\nu}T \right)^2 }{\left( e^{\frac{\beta\nu}T} - 1 \right)}
+	\]
+</div>
+<p>
+
+</p>
+
+<p>
+Thus we obtain by summing over all the basic vibrating elements, which in the 
+</p>
+<img src="file.jpg"/>
+<p>
+relevant solid substances, gives the following expression for the specific heat per gram-equivalent <sup><a href="#ref_8">[8]</a>
+</p>
+
+<div class="math">
+	\[
+	c = 5.94 \sum \frac{e^{\frac{\beta\nu}T} \left( \frac{\beta\nu}T \right)^2}{e^\{\left( \frac{\beta\nu}T} - 1 \right)^2}
+	\]
+</div>
+
+<p>
+The figure above<sup><a href="#ref_9">[9]</a></sup> shows the value of expression (<a href="#eq_8">8</a>) as a function of \(\frac T{\beta\nu} \). If \( \frac T{\beta\nu} > 0.9\), then the contribution of the element for the molecular specific heat will not differ significantly from \(5.94\), which is also  same result as the hitherto accepted molecular-kinetic theory. The smaller \(\nu\) is, the lower the temperature
+</p>
+<div style="position:fixed;bottom:0px;background:#777;width:100%;height:10%;margin:0;padding:0;display:none">
+	<div id="ref_close" style="position:absolute;top:0;right:4%;background:red"><a>x</a></div>
+	Hello Planet BMO </div>
+
+
+	</body>
+
+</html>

@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Temperature and Entropy of Radiation</title>
+    <title lang="de">Temperatur und Entropie der Strahlung</title>
+    <!--FOR TESTING PURPOSES-->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/open-fonts@1.1.1/fonts/inter.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css"
+    />
+    <link rel="stylesheet" href="C:\xampp\htdocs\test\src\katex.min.css" />
+    <script defer src="C:\xampp\htdocs\test\src\katex.min.js"></script>
+    <script
+      defer
+      src="C:\xampp\htdocs\test\src\auto-render.min.js"
+      onload="renderMath()"
+    ></script>
+    <!------------------------->
+
+    <style>
+      a {
+        color: blue;
+      }
+      a:hover {
+        color: violet;
+        cursor: pointer;
+      }
+      a:active {
+        text-decoration: underline;
+      }
+      main figure {
+        text-align: center;
+        margin: 50px auto;
+      }
+      figcaption {
+        margin: auto 20px;
+      }
+      .footnote_area {
+        width: 80%;
+        background: lightgrey;
+        color: black;
+        position: fixed;
+        bottom: 0;
+        left: 10%;
+        margin: auto;
+        min-height: 35px;
+        padding: 2px;
+        display: none;
+        box-shadow: inset #bababc -4px 3px 3px 1px;
+      }
+      #fn_close {
+        position: absolute;
+        right: 0;
+        background: none;
+        border: none;
+      }
+      #fn_close:hover {
+        font-size: 100%;
+        text-decoration: underline;
+        background: darkgrey;
+      }
+      #fn_content {
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+    <script>
+      function renderMath() {
+        //render KaTex Math, for Testing
+        renderMathInElement(document.body);
+      }
+      function ref(id) {
+        //get footnote
+        var note = document.getElementById("fn" + id);
+        alert(note.innerHTML);
+      }
+      window.onload = function () {
+        var refLinks = document.querySelectorAll("sup a");
+        refLinks.forEach((ref) => {
+          ref.onclick = function (e) {
+            e.preventDefault();
+            var r = ref.href;
+            var fn = r.slice(r.indexOf("#"));
+
+            var footnote = document.querySelector(fn);
+
+            var fnContent = document.getElementById("fn_content");
+            fnContent.innerHTML = footnote.innerHTML;
+            openFootnote();
+          };
+        });
+      };
+      function closeFootnote() {
+        var fn = document.querySelector(".footnote_area");
+        fn.style.display = "none";
+      }
+      function openFootnote() {
+        var fn = document.querySelector(".footnote_area");
+        fn.style.display = "block";
+      }
+    </script>
+  </head>
+  <body>
+    <main>
+      <h1>Temperature and Entropy of Radiation</h1>
+      <p>
+        Nearly every kind of radiation can be produced from the heat supplied by
+        solid bodies, and contains a finite amount of energy in spaces of finite
+        extent, even within the free ether, because the speed of its propagation
+        is not infinitely great. It must therefore be subject to the laws of
+        thermodynamics, regardless of the source from which it originates. If
+        one therefore considers radiation, which is known to be produced only by
+        heat, and which is also in thermal equilibrium, then it must be
+        thermodynamically completely determined by its volume, energy density
+        and its properties, with no dependence on the emitting bodies.
+        Additionally, it should be possible to determine the temperature and
+        entropy, as soon as a definite quantity of radiation in equilibrium is
+        given, for which no further exchange of energy is possible, and for
+        which we have also convincingly demonstrated that all the rays can be
+        produced by heat.
+      </p>
+      <p>
+        Very little has to be excluded from these considerations, namely
+        Hertzian waves and cathode rays, if these are even waves at all.
+      </p>
+      <p>
+        The necessity of these investigations, and the introduction of the
+        concept of temperature for radiation has already been pointed out by
+        <em>Mr. E. Wiedemann</em> <sup><a href="#fn1">[1]</a></sup
+        >. Additionally, the radiation which arises from hotter bodies must be
+        ascribed higher temperatures.
+      </p>
+      <p>
+        We now set ourselves the task of determining radiation only from its
+        state, even if it is given to us completely detached from the emitting
+        bodies. The possibility for this is offered to us by a corollary of
+        Kirchhoff's theorem:
+      </p>
+
+      <blockquote>
+        <p>
+          If we completely enclose an empty space with bodies of arbitrary
+          nature but finite absorptivity for all rays, and keep the enclosure at
+          the same temperature, then the radiation in the cavity, after
+          establishing equilibrium, will be the same as if the surrounding walls
+          were completely black; it therefore depends only on the temperature
+          and not on the nature of the bodies.
+        </p>
+      </blockquote>
+      <p>
+        According to this, the radiation of a black body is a state of stable
+        thermal equilibrium; any radiation of a different nature is
+        automatically converted into that of a black body in such an
+        arrangement. As soon as this state has occurred there is no longer any
+        exchange of heat between solid bodies and the cavity. Accordingly, we
+        must attribute to this radiation the same temperature as to the adjacent
+        walls.
+      </p>
+      <p>
+        The definition of black body radiation as a state of stable thermal
+        equilibrium seems to have considerable advantage over the original one.
+        This must assume as possible a body which absorbs all incident rays. The
+        physical condition for this however is that the body has the same
+        propagation speed for rays of every wavelength as that of empty space, a
+        requirement which according to more recent views on dispersion is not
+        fulfilled by any body. From these considerations we can treat the
+        equilibrium condition as though it came from a perfectly black body.
+        This often simplifies the treatment a lot, and we shall refer to them by
+        the same name accordingly.
+      </p>
+
+      <h2>
+        Properties of the Equilibrium of Radiation. Perfect and Diffuse Mirrors.
+        States of Unstable Equilibrium
+      </h2>
+      <p>
+        It was already deduced by <em>Kirchhoff</em> that black body radiation
+        cannot have any preferred direction in relation to the radiating surface
+        or polarization. In an earlier work, I deduced the well-known law of
+        cosines from this <sup><a href="#fn2">[2]</a></sup
+        >. It follows that this radiation must be produced between two infinite
+        planes of the same temperature, and the radiation of each of them yields
+        half the radiation present at any point.
+      </p>
+      <p>
+        If the cavity considered above is only partly surrounded by radiating
+        surfaces and partly by mirrors, this does nothing to change the energy
+        distribution, if the mirrors are perfectly diffuse reflectors. For the
+        heated bodies will continue emit energy until every bundle of ray has
+        equal energy on both sides. In some cases, this is also true if the
+        mirrors reflect perfectly regularly. For example, a rectangular
+        parallelepiped is given, where the sidewalls \(ab\) and \(dc\) radiate
+        while the others reflect regularly.
+      </p>
+      <figure id="fig1" style="float: left">
+        <img src="img/fig-1.png" alt="figure 1" />
+        <figcaption>Fig. 1</figcaption>
+      </figure>
+      <p>
+        The effect of the sidewalls would then be the same as if a radiating
+        surface \(bb'\) were present in place of \(bc\). The resulting sum of
+        all reflections is the same as if \(ab\) and \(dc \) were to extend to
+        infinity. As we have seen, black body radiation is then produced. There
+        is, however, an essential difference, depending on whether the mirrors
+        reflect diffusely or regularly, which, incidently, can be rendered in
+        such a way that the state is different in the immediate vicinity of the
+        radiating bodies and the diffuse mirrors, than at a finite distance from
+        these or at the surface of regular mirrors. This is easily recognized if
+        one considers that the processes at two neighbouring points of a
+        radiating surface or diffuse mirror are completely independent of each
+        other. While at a finite distance from these points, all the changes in
+        the radiating surface will determine the state,yet a neighbouring point
+        at any moment can only receive infinitely little change. In the first
+        case a state is represented by a non-differentiable, in the second by a
+        differentiable function of position. However, changes in the state of
+        equilibrium would not be expressed by functions which would be
+        differentiable with respect to time. In the state of equilibrium, both
+        types of state would be thermodynamically completely equivalent, because
+        they can easily be converted into each other.
+      </p>
+      <figure id="fig2" style="float: right">
+        <img src="img/fig-2.png" alt="figure 2" />
+        <figcaption>Fig. 2</figcaption>
+      </figure>
+      <p>
+        Other equilibrium states can be conceived with different arrangements of
+        the mirrors. Let \(ab\) be the average of a circular radiating plane.
+        Let a hemisphere be placed around the center of the disk, which should
+        perfectly reflect inside. All rays which go out from the body are then
+        reflected back to it. In this way, an equilibrium of energy can also
+        occur, without the energy density everywhere being that corresponding to
+        the radiating plate and the stable equilibrium. This state of
+        equilibrium is immediately disturbed as soon as a small part of the
+        spherical surface no longer reflects regularly or a foreign body is
+        brought into the cavity. Since the equilibrium here can be disturbed
+        without an equivalent amount of work, we are entitled to call it
+        unstable. Also in this case, the plate \(ab\) could be of any nature, if
+        only it had a finite absorptivity for each wavelength at the time of
+        production of the radiation, because each bundle of rays coming from
+        \(ab\) is reflected back and forth until it is completely absorbed,
+        therefore just as much energy must go in the opposite direction. As soon
+        as the equilibrium is established, the radiating disk can be replaced by
+        a perfect mirror without changing the state of the radiation.
+      </p>
+      <p>
+        Additionally, any other deviation of radiation in equilibrium from that
+        of a black body can only be regarded as an unstable equilibrium, since
+        it can be converted to the state of stable equilibrium without any
+        specifiable work input. If it has any preferred direction, a diffuse
+        screen suffices for this purpose; deviations in the color composition
+        can be compensated by a radiant body at a temperature corresponding to
+        the given energy density without performing any work.
+      </p>
+
+      <h2>
+        Determination of the Temperature of a Given Equilibrium Radiation.
+        Maximum Work Obtainable From Radiation
+      </h2>
+
+      <p>
+        The heat present in the form of radiation differs from that present in
+        solid bodies in that proves to be a mixture of energy of different
+        properties, which we can detect by suitable apparatus. These constituent
+        parts are independent of each other, because we can produce radiation
+        which contains only the individual ones. Thus we are forced to attribute
+        the temperature of the entire system to each individual components of
+        the radiation of black bodies.
+      </p>
+      <p>
+        Only in this way can we also satisfy the condition that no exchange of
+        heat may take place if the temperature is the same. If, for example, we
+        have radiation in stable equilibrium, in a closed room with reflecting
+        walls, and completely diffuse radiation of a different color composition
+        in an adjacent room, equilibrium between the two is only possible when
+        they have completely merged, so that every single spectral color has the
+        same density in both rooms. The density of each color must be equal in
+        order for equilibrium to exist. So we have to attribute the same
+        temperature to every single color which occurs in the radiation of the
+        black body. To every other spectral color, we must attribute the same
+        temperature that a black body would have if it contained that color in
+        the same density. For only then could the energy of this color be in
+        equilibrium with both. This determination of the temperature is
+        unambiguous, because it has only a given color in a certain density.
+        Radiation of mixed colors is to be understood in general as a system of
+        energy at different temperatures; its transformation into the color
+        composition of black body radiation is therefore a balance of these
+        different temperatures.
+      </p>
+      <p>
+        We are now able to calculate the maximum work that can be obtained from
+        a given diffuse radiation, while the [remainder?] changes it color
+        composition, assuming we know the energy distribution of the black body
+        spectrum. If we plot this distribution graphically, so that the
+        wavelengths form the abscissas, the corresponding energy density
+        \(\varphi\) the ordinates (so that \(\varphi d\lambda\) is energy
+        density of the color between \( \lambda\) and \(\lambda + d\lambda\),
+        then the curve obtained must show at least one maximum, because the
+        energy vanishes both for \( \lambda = 0 \) and for \( \lambda = \infty
+        \). From experiments, we observe only one maximum. We will show later
+        that the curves for different temperatures cannot intersect.
+      </p>
+      <p>
+        All spectral colors that we cut from the area enclosed by the curve have
+        the same temperature. Let's take a narrow piece of \(a\) on the side
+        located from the maximum to the shorter wavelengths. If an equally wide
+        piece of \(b\) of shorter wavelengths is cut out, it is obvious that
+        this color must have a higher temperature this color will have to be of
+        a greater temperature if the ordinate above \(b\) is to have the height
+        of \(a\), so if both colors are homogeneous in the same way, the width
+        of \(a\) and \(b\) must be a certain part of the wavelengths. Then \(
+        \frac ab = \frac{\lambda_a}{\lambda_b} \), where \(\lambda_a\) and
+        \(\lambda_b\) denote the corresponding wavelengths. This would require a
+        further increase in the temperature of \(b\). Conversely, each color
+        between \(a\) and the maximum would have a lower temperature at the same
+        density, as well as on the other side of the maximum up to the point
+        \(c\) where the temperatures are equal, and which is determined by the
+        equation \( c\varphi_c = a\varphi_a \) or \( \lambda_c \varphi_c =
+        \lambda_a \varphi_a \). Beyond that point the temperature increases
+        again.
+      </p>
+      <p>
+        Let \(\vartheta_0\) be the absolute temperature at which the density of
+        \(b\) equals \(b\varphi_b\) , then during any transformation of the
+        color \(b\) into \(a\),which occurs at a constant density, the quantity
+        of work is at a maximum.
+      </p>
+      <p>
+        \[ b\varphi_b \frac{ \vartheta_1 - \vartheta_0 }{\vartheta_1} \] This
+        follows from the well-known principles of thermodynamics. In this case,
+        the color \(a\) has taken on the value
+      </p>
+      <p>\[ b \varphi_b \frac{\vartheta_0}{\vartheta_1} \] or the value</p>
+      <p>
+        \[ a\varphi_a \frac{\vartheta_0}{\vartheta_1} \] if we use \(a\) instead
+        ,and the minimum amount of work required to transform it radiation into
+        radiation of color \(b\) is
+      </p>
+      <p>
+        \[a \varphi_a \frac{\vartheta_1 - \vartheta_0}{\vartheta_1} \] When
+        transforming radiation of mixed colors it is necessary to consider the
+        changes of each of them. Let \( \varphi_1 ( \lambda) \) be a given
+        energy distribution, so that
+      </p>
+      <p>
+        \[ \psi = \int\limits_0^\infty \varphi_1 d\lambda \] gives the total
+        radiation density. If we transform this into a radiation with the energy
+        distribution \( \varphi_2 \left( \lambda \right) \), then for each color
+        the (recoverable work?) is
+      </p>
+      <p>
+        \[ \varphi_1 d\lambda \frac{\vartheta_1 - \vartheta_0}{\vartheta_1} \]
+        where \( \vartheta_0\) results from \( \varphi_2 \left( \lambda \right)
+        \)
+      </p>
+      <p>
+        This is the second black body energy distribution for which \(
+        \vartheta_0\) is constant, therefore
+      </p>
+      <div class="equation" id="eq2">
+        \[ A = \int\limits_0^\infty \varphi_1 d\lambda - \vartheta_0
+        \int\limits_0^\infty \frac{\varphi_1 d\lambda}{\vartheta_1} = \psi -
+        \vartheta_0 \int\limits_0^\infty \frac{\varphi_1 d\lambda}{\vartheta_1}
+        \]
+      </div>
+      <p>
+        This is the general equation for the maximum amount of work that can be
+        obtained in a given volume. [TODO:Continue]
+      </p>
+
+      <figure id="fig4">
+        [Insert Figure 4 Image here]
+        <figcaption>Fig. 4</figcaption>
+      </figure>
+      <p>
+        Apart from the differences in color, we also have to account for the
+        differences in the direction of radiation. We have already seen that for
+        black body radiation no preferred direction can exist, but there exist
+        states with preferred direction that can keep themselves in equilibrium.
+        Numerous conclusions from the laws of refraction and the second law of
+        thermodynamics have already been drawn by Mr. <em>von Helmholtz</em> and
+        have resulted in important laws for the brightness of rays.
+      </p>
+      <p>
+        Let us now consider the radiation of a black body as it is produced
+        between two infinite radiating planes of the same temperature. Through
+        any surface element \(ds\), lying between both planes, an equal amount
+        of energy will flow in each direction, regardless of the direction of
+        the normal to \(ds\). For if the plane element were itself to radiate,
+        the energy emitted would be independent of this direction; but it would
+        also have to receive the same amount; it therefore cannot depend on the
+        direction either. The direction of the radiation is not influenced by
+        whether the medium is completely transparent, partially or totally
+        reflective, or radiates. It always radiates energy through a hemisphere
+        around its centre point.
+      </p>
+      <p>
+        \[ \varepsilon ds \int\limits_0^{2\pi} \int\limits_0^{\frac\pi 2}
+        d\gamma d\alpha \sin\alpha \cos\alpha = \pi\varepsilon ds \] where \(
+        \varepsilon\) depends only on the temperature of the radiating plates.
+        \( \pi\varepsilon\) is then the emissivity of a black body according to
+        Kirchhoff's definition. To obtain the energy density, we consider the
+        space between the two planes, which may have a distance \(h\). The unit
+        surface of each plane emits the energy \( 2\pi\varepsilon d\alpha
+        \sin\alpha \cos\alpha \) at the angle \(\alpha\) inclined to the normal.
+        Each ray of this direction passes through the length \( \frac
+        h{cos\alpha} \) until it is absorbed by the opposing plane.
+      </p>
+      <p>If \(c\) is the velocity of light, these rays contain the energy</p>
+      <p>
+        \[ \frac{2\pi\varepsilon d\alpha \sin\alpha \cos\alpha}c \frac
+        h{\cos\alpha} \] If we note that the same amount of energy goes back and
+        forth, and we divide by the volume, then the density is
+      </p>
+      <p>
+        \[ \psi = \frac{4\pi\varepsilon}c = \frac{4e}c \] If we now consider
+        limited cones of rays, e.g. those produced when imaging through lenses,
+        it follows from the known theorems that the aperture of cone the rays
+        always correspond to the size of the image, so that the narrower cone,
+        which belongs to the larger image, includes that much less of the
+        emitted rays. If the two images both have the same temperature ,then the
+        same amount energy flows back and forth between them. It follows from
+        this that the size of the aperture and energy density of the rays in the
+        cone corresponds to a temperature, and that for any given cone of rays
+        there exist a maximum temperature which can be produced or maintained,
+        because with every increase above the maximum, the backwards flow of
+        energy predominates.
+      </p>
+      <p>
+        The temperature of the radiating body must be attributed to the energy
+        which goes back and forth in such a limited pencil of rays, since we can
+        concentrate it to produce such a temperature. However, it must be
+        presupposed that no dispersion of light occurs on its way. A consequence
+        of this determination is that with regular arrangement of the radiation
+        direction the energy can posses a high temperature, even if its density
+        is much smaller than that of a black body. Therefore, one can produce
+        very high temperatures with direct solar radiation, while dispersed
+        daylight has a much lower temperature, although both come from the same
+        source. If there is an angle of divergence of the rays coming from this
+        point of the sphere, then an element \(ds'\) of \(ab\) sends \(ds\) the
+        amount of energy \( \varepsilon ds ds' cos^2 \alpha_1 / r^2 \), where
+        \(r\) is the distance between \(ds\) and \(ds'\). Now
+      </p>
+      \[ ds' = \frac{2\pi r^2 \sin\alpha_1}{\cos\alpha_1} d\alpha_1 \] the total
+      energy radiated from \(ab\) to \(ds\) is
+      <p></p>
+      <p>
+        \[ 2\pi\varepsilon ds \int\limits_0^\alpha \sin \alpha_1 \cos \alpha_1
+        d\alpha_1 = \pi \varepsilon ds \sin^2\alpha = e ds \sin^2 \alpha \] If
+        we want to obtain the energy density near \(ds\), we consider an
+        infinitely small rectangular parallelepiped erected above \(ds\) with
+        height \(h\), the energy is found to be
+      </p>
+      <p>
+        \[ \frac{2ds}c \cdot 2\pi\varepsilon \int\limits_0^\alpha \sin \alpha_1
+        \cos \alpha_1 d\alpha_1 \frac h{\cos\alpha_1} = \frac{4ds\pi\varepsilon
+        h}c (1-\cos\alpha) \]
+      </p>
+      <p>
+        therefore the density is either \[ \psi_\alpha = \frac{4e}c(1-
+        \cos\alpha) \] or \[ \psi_\alpha = \psi(1 - \cos\alpha) \]
+      </p>
+      <p>
+        Since we also assume the temperature dependence of \(\phi\) is known,
+        the equation
+      </p>
+      <div class="equation" id="eq3">
+        \[ \psi = \frac{\psi_\alpha}{1 - \cos\alpha} \]
+      </div>
+      <p>
+        allows us to determine the temperature for a given \(\alpha\) and
+        \(\phi_\alpha\). It should be noted that the mapping between an object
+        and its image can be made arbitrarily small, making this temperature
+        valid for any cone of rays. However, the rays must follow a path with
+        negligible diffraction. Diffraction always has the effect of scattering
+        the direction of the rays, which makes it an irreversible process. When
+        \(\alpha\) becomes very small, we approach the case of a basic cone,
+        with no rays crossing laterally at a finite distance from the center of
+        the sphere. From equation(<a>3</a>), we observe that in this scenario,
+        the temperature of a finite density of radiation becomes infinitely
+        large compared to the temperature of the black body radiation of equal
+        density. The transformation of such regular radiation into that is
+        scattered in all directions corresponds to a lowering of the
+        temperature, and therefore not readily reversible. However it can serve
+        as a compensation for the work obtained from radiation. The maximum work
+        can be obtained in a specific direction, with the remaining scattered,
+        is given by \( \frac{(\theta_1 - \theta_0)}{\theta_1} \), where the
+        value of \(theta\) are to by determined as specified.
+      </p>
+      <p>
+        So far, the radiation has always been assumed to be unpolarized. The
+        full effect of polarization can only come into play with rays that have
+        very nearly the same direction in a narrow bundle, as we were able to
+        achieve at a small angle \(\alpha\) above. Then the influence of
+        polarization is such that a polarized beam has the same temperature as
+        an unpolarized beam, having twice the density of energy. In fact, a
+        linearly polarized beam of rays will pass completely through a suitably
+        arranged polarizing prism and fall on a radiating body \(s\), while only
+        half of the reciprocal rays of \(s\) travel the path of the polarized
+        rays, while the others are directed in a different direction through the
+        polarizing prism. Rays of equal polarization, on the other hand, travel
+        the same path in both opposite directions.
+      </p>
+      <p>
+        As noted by Mr. von Helmholtz <sup><a>[1]</a></sup
+        >, the reciprocity of the ray path ceases as soon as the plane of
+        polarization is rotated by magnetic forces. Let parallel light, with
+        energy \(q\) per unit time, pass through a Nicol Prism 1, where the
+        totally reflected ray is not absorbed but reflected back by a mirror.
+        All the apparatus, including the bodies emitting rays, is enclosed in an
+        adiabatic cavity. The arrangement can be thought of exactly as Kirchhoff
+        conceived in his well-known treatise on the relationship between
+        emission and absorption, so it is not necessary to delve further into
+        it. The transmitted rays pass through a non-absorbing medium where the
+        plane of polarization is rotated by an angle \(\alpha\) due to magnetic
+        forces, then continue through a second Nicol prism 2, whose main section
+        forms the angle \(\epsilon\) with that of the first. The rays completely
+        reflected here should be reflected in the direction of their arrival.
+        Then the energy \( \frac q2 (\cos^2(\epsilon - \alpha)) \) passes
+        through prism 2, while everything else is reflected. If we now allow the
+        same amount of light to enter from the other side with the same
+        arrangement. The quantity \( \frac q2 (\cos^2(\epsilon + \alpha) ) \)
+        passes through the first prism. Reflections at the boundaries of
+        transparent media are disregarded, as these can be arbitrarily reduced
+        by a suitable choice of the same.
+      </p>
+      <p>
+        Two bodies of equal temperature would not radiate the same amount of
+        heat to each other. The body lying at 1 would receive \[ q - \frac q2 (
+        \cos^2 (\epsilon - \alpha) - cos^2 (\epsilon + \alpha )) \]
+      </p>
+      <p>
+        which at 2 is the quantity \[ q + \frac q2 ( \cos^2(\epsilon - \alpha) -
+        \cos^2(\epsilon + \alpha ) \]
+      </p>
+      <p>
+        The difference \( q\cos^2(\epsilon - \alpha) - \cos^2 (\epsilon +
+        \alpha) \) reaches its greatest value at constant \( \alpha\) when \(
+        \epsilon = \frac \pi 4 \). It is then \( q \sin 2\alpha \). For \(
+        \alpha = \frac \pi 4 \), 2 then receives three times as much energy as
+        1.
+      </p>
+      <p>
+        But we can also use this arrangement to transfer heat from a colder to a
+        hotter body, namely when 2 has a higher temperature \(\theta_2\) than
+        the temperature \(\theta_1\) of 1. Here we imagine the arrangement in
+        such a way that two identical systems, as shown in Fig. 2, are opposite
+        each other at a suitable distance, where the radiating bodies have
+        different temperatures. Let the bodies be very small, so that the
+        divergence angles of the rays reflected by the sphere are small. If we
+        now open the spherical surfaces through two segments, the axis of which
+        is the line connecting the radiating bodies, we can have the emerging
+        rays of one hit the other, while the rays between the lenses run almost
+        parallel. The lenses are seen as infinitely thin. If we imagine a
+        reflecting spherical surface in place of the body 2, the center of which
+        lies in the middle of the lens that lies in front of this body, then all
+        rays emanating from 1 will first hit the lens again and thus return to
+        1. Using similar devices, we can guide all rays deflected by the
+        polarizing prisms back to the starting point. Let \( 2f(\theta_1)\) be
+        the energy emanating from 1 in our direction at the time, \(
+        2f(\theta_2)\) the energy radiated by 2.
+      </p>
+      <p>The following is then obtained</p>
+      <p>
+        2 receives \( f(\theta_1)\cos^2(\epsilon - \alpha) +
+        f(\theta_2)\sin^2(\epsilon + \alpha) + f(\theta_2) \)
+      </p>
+      <p>
+        1 recieves \( f(\theta_2)\cos^2(\epsilon + \alpja) +
+        f(\theta_1)\sin^2(\epsilon - \alpha) + f(\theta_1) \)
+      </p>
+      <p>
+        2 emits \( 2f(\theta_2)\) in this direction, so it receives the surplus
+        \[ U = f(\theta_1)cos^2(\epsilon - \alpha) - f(\theta_2)\cos^2(\epsilon
+        + \alpha) \] per unit time
+      </p>
+      <p>
+        and for \(\epsilon = \frac\pi4 \), \[ U = \frac {f(\theta_1)}2 (
+        \cos\alpha + \sin\alpha)^2 - \frac{f(\theta_2)}2(\cos\alpha -
+        \sin\alpha)^2 \]
+      </p>
+      <p>
+        the quantity of heat \(U\) changes from the temperature \(\theta_1\) to
+        \(\theta_2\). In Clausius' terms, this is a negative transformation
+        whose transformation value \[ -U(\frac1{\theta_1} - \frac1{\theta_2}) \]
+      </p>
+      <p>
+        vanishes for \(\theta_1 = \theta_2\), on the other hand, with a
+        decreasing \(\theta_1\) it must also go through a value of zero, because
+        \( f(\theta_1) \) becomes smaller. This quantity must therefore have a
+        maximum for a certain value \(\theta_1\). It follows from the equation
+        \[ \frac{dU}{d\theta_1} ( \frac1{\theta_1} - \frac1{\theta_2} ) - \frac
+        U{\theta_1^2} = 0 \]
+      </p>
+      <p>TODO</p>
+      <p>
+        As soon as \( f(\theta ) \), \( \theta_2\), \(\alpha\) are given, the
+        maximum of the transformation value can be calculated.
+      </p>
+      <p>
+        For \(\alpha = \frac\pi4 \), \( U = f(\theta\) has its greatest value.
+        If we also take for \( f(\theta\) Stefan's radiation law, which was
+        theoretically established by Boltzmann for the radiation of black
+        bodies, namely \( f(\theta) = c\theta^4\), where \(c\) is constant,
+        then, since for \( \alpha = \frac\pi4 \) <sup><a>[1]</a></sup
+        >, \[ \cos\alpha - \sin\alpha = 0, U = c\theta_1^4 \]
+      </p>
+      <p>
+        The maximum therefore results from the equation \[ \[ 3\theta_1^2 -
+        \frac{4\theta_1^2}{\theta_2} = 0, \mathrm{also} \theta_1 = \frac34
+        \theta_2 \]
+      </p>
+      <p>
+        The quantity \[ -U (\frac1{\theta_1} - \frac 1{\theta_2} ) \] will be \[
+        = - \frac{27}{256} \cdot c \theta_2^3 \]
+      </p>
+      <p>
+        Since this transformation value is negative, it must be accompanied by
+        at least an equivalent value. There must be an entropy increase caused
+        by the magnet acting on the light. It remains to be seen whether heating
+        by itself or simultaneously with the use of the radiation energy serves
+        as compensation. The most obvious assumption seems to me to be that
+        light destroys the existing magnetization of the medium and transforms
+        the magnetic energy into heat.In the case of external, constant magnetic
+        forces, this is similar to the way in which the electromotive force
+        keeps the lines of electric force constant, which are destroyed
+        according to Ohm's law.Since the transformation value increases rapidly
+        with increasing \(\theta_2\), such an effect should depend on the
+        intensity of the transmitted light. The experiments hitherto have not
+        yet been directed at this question.
+      </p>
+      <p>
+        The theorems that have so far been established about the magnetic
+        rotation of the plane of polarization are also unable to provide any
+        information.
+        <sup><a>[1]</a></sup>
+      </p>
+      <h2>
+        Changes in the volume of enclosed radiation. Work output. Reciprocity
+        Relations
+      </h2>
+      <p>
+        The previous observations are independent of any theory of light. They
+        are merely an application of the thermodynamic theorems. The specific
+        properties of the rays require only that the energy be broken down into
+        individual components.
+      </p>
+      <p>
+        From the second fundamental theorem, the conclusion is drawn that
+        radiation exerts a pressure on an irradiated surface, and the magnitude
+        of this pressure can be calculated if its dependence on temperature is
+        known. We would then still remain independent of any hypothesis with a
+        large number of possible considerations from the existence of this
+        pressure. However, since we know the radiation laws of black bodies
+        empirically with very little certainty, it seems to me more reliable to
+        assume the electromagnetic theory of light, which allows the magnitude
+        of this pressure to be calculated. Also, if the assumption about the
+        pressure were different, the conversions could be carried out with the
+        greatest of ease.
+      </p>
+      <p>
+        According to Maxwell's theory, a plane wave that falls on the boundary
+        of a plane surface and is absorbed, exerts a pressure on the unit area
+        that is equal to the energy in the unit volume multiplied by the cosine
+        of the angle of incidence. If the plane is reflective, the pressure of
+        the reflected wave is added to this. In the case of incident spherical
+        waves, the pressure is always calculated from the energy and the
+        direction of the wave normal.
+      </p>
+      <p>
+        If the irradiated surface is subjected to the pressure, the pressure can
+        perform work at the expense of the energy of the radiation. Conversely,
+        if the surface moves against the incident rays, work must be supplied
+        from outside, which increases the energy of the radiation. Let us
+        examine the relationship between the radiation and the external energy
+        in more detail.
+      </p>
+
+      <b style="color: red"> [TODO:FIX HERE!!!]</b>
+
+      <p>
+        where \(\frac1\Lambda \) is the speed of light, and \(\varphi\) is a
+        solution of the equation \[ \frac{\partial^2 \varphi}{\partial t^2} =
+        \frac1{A^2} \Delta \varphi \]
+      </p>
+      <p>
+        In order for the walls to reflect perfectly, the boundary conditions
+        show that the parallel components of the electric, and the perpendicular
+        components of the magnetic force must disappear, because perfect
+        reflection in all directions is possible only for bodies whose
+        electrical conductivity is infinitely large.
+      </p>
+      <p>
+        These conditions are satisfied if we introduce the back-and-forth
+        reflected image of the source.
+      </p>
+      <p>
+        We consider a source of electromagnetic waves within a perfectly
+        reflecting rectangular parallelepiped whose center is the coordinate
+        zero. If \( x = \pm a, y = \pm b, z = \pm c \) are the walls, \( X, Y, Z
+        \) are the components of the electric force, \( L,M,N \) those of the
+        magnetic force, we can satisfy Maxwell's equations by setting [1].
+      </p>
+      TODO soon...
+      <p>
+        \(\varphi_1\) and \(\varphi_2) satisfy equation (5), \(\varphi_1 -
+        \varphi_2\) vanishes for \( x = + \alpha\).
+      </p>
+      <p>
+        The oscillation in the reflected image at \( z = +c \) apparently
+        excites the wave [TODO:]
+      </p>
+      <p>(...) disappears for \(z=c\).</p>
+      <p>
+        If we find the sum of all reflections in such a way, we get [1] [TODO]
+        for \( mr - nt = 0 \) into the well known \(\vartheta\)-functions.
+      </p>
+      <p>
+        The process represented here are subject to the general laws of
+        reciprocity, for they can be represented in the form of the principle of
+        least action [1], as soon as the points of instability where \(r\)
+        vanishes are excluded.
+      </p>
+      <p>
+        In an earlier work, I showed that the flow components of the energy are
+        represented by the expressions (...TODO)
+      </p>
+      <p>
+        In forming this expression, by differentiation of \(t\) with respect to
+        \(phi\), the quantity \(n\) will appear as a factor. If we substitute
+        \(-n\) for \(n), we get system , but with energy flowing backwards.
+        Whereas in the first case, the energy value of the system continuously
+        increases from the inflow point, in the second it will continuously
+        decrease. From this it follows, that as soon as electromagnetic
+        oscillations can be produced by means of such an arrangement, the
+        principle of least action is fulfilled, states are possible in which,
+        conversely, with the same arrangement, the existing energy of
+        electromagnetic oscillations can be converted into external work. Such
+        oscillations, therefore, which are generated by finite body systems
+        cannot occur in thermal radiation, because otherwise, with the same
+        system, we could continuously convert the energy of these oscillations
+        into work, without compensation, by replacing hot bodies with radiation.
+      </p>
+      <p>
+        It has already been shown, by Mr.Rubens, that by means of alternating
+        current machines, which on the one hand produce electric oscillations,
+        and on the other hand, convert the energy of the alternating current
+        into work, We could produce work from heat with compensation, if
+        oscillations of oscillations of corresponding duration were present in
+        the radiation. The same result has been derived by me earlier, by quite
+        different considerations [1].i By the way, if long electromagnetic waves
+        existed, the pressure of radiation itself would allow for the conversion
+        of energy into work without compensation. Let us suppose we have
+        monochromatic radiation in a closed reflective space, which has the same
+        phase on a movable part of the wall; if we enlarge the space, the
+        pressure of the radiation performs work, but the compensation for this
+        lies in the increase in the volume, which cannot be reversed without an
+        equal amount of work. The pressure on the wall cannot be reverse. The
+        pressure has half the period of the oscillation, while increases from
+        zero to maximum, then decreases back to zero.
+      </p>
+      <p>
+        But if we could follow the oscillation with the movement of the mirror
+        in such a way that, when the pressure is close to zero, we direct it
+        towards the radiation, but near the maximum, we let the radiation do
+        work, then work will be produced without compensation.
+      </p>
+      <p>
+        It may remain to be seen whether the required velocity of the piston is
+        impossible due to the actual thermal radiation, or more likely, the
+        apparently secondary, irreversible accompanying phenomena, such as
+        friction , receive a great prevalence. In any case, it is evident that
+        the wavelength of thermal radiation must not exceed a certain limit.
+        Just as the second law of thermodynamics is valid only so long as one
+        can attack the motion of the molecules as a whole, so it ceases to apply
+        as soon as one is able to act on individual thermal vibrations.
+      </p>
+      <p>
+        If we compress the radiation in the manner considered, the question
+        arises as to the direction the radiation added by external work. If the
+        reflection remains regular during the movement, every point that
+        received the waves by reflection from the mirror will receive a lower
+        radiation corresponding to the reduction in density, provided that the
+        speed at which it moves is infinitely small compared to the speed of
+        light, so that the radiation is compensated at any moment. When the
+        mirror moves in the opposite direction, a corresponding increase occurs.
+        This follows from Huygen's principle as expressed more precisely by
+        Kirchhoff [1]. According to this, the state in any point can be regarded
+        as originating from from a layer of luminous points spread over the
+        reflecting walls. Let us assume the moving wall is flat. Each point
+        receives a finite amount of energy from a specific source; if it was
+        infinitely small before, it must now still disappear. The increased
+        radiation from the movement of the piston therefore follows a regular
+        path. Only in this way is the process reversible with regular
+        reflection.
+      </p>
+      <h2>
+        Temperature as an Integrating denominator of the differential of the
+        energy supplied, and the determination of entropy. Change of color
+        according to Doppler's Principle
+      </h2>
+      <p>
+        In cases where the volume of the enclosed radiation changes, we have to
+        distinguish between those in which the radiation is considered to be in
+        constant contact with the radiating body, and therefore isothermal with
+        a sufficient heat supply from the body, and those in which the
+        radiation, separated from the radiating bodies, is enclosed in perfectly
+        reflective containers. In the latter case, the color of the radiation
+        changes according to Doppler's principle, as I have previously shown
+        [1]. If perfectly diffuse radiation is sent back and forth between in a
+        rectangular parallelepiped with regular reflecting walls the rays that
+        stand out at a certain angle against the normal of the mirror will
+        retain this angle even when the volume is reduced.The smaller the angle
+        they form with the normal, the more the rays are amplified by external
+        energy.In the same way, these rays will also be more affected by the
+        change due to Doppler's principle. We then get rays that have different
+        colors depending on direction. The change in color and intensity is
+        completely reversible.For the latter we have already shown reversibility
+        in &sect; 3
+      </p>
+      <p>
+        The change of the color is given by the equation \[ \lambda_1 = \frac{c
+        + 2\nu\cos\alpha}c\lambda_0 \] where \(\lambda_0\) is the original
+        wavelength, \(\lambda_1\) is the wavelength after reflection from the
+        moving mirror and \(c\) is the speed of light, \(\alpha\) is the angle
+        between the mirror normal and the ray. If \(x\) is the distance of the
+        moving mirror from the opposite wall, then the ray is reflected once
+        while the mirror travels the distance \(dx\), where \[ n\frac {dx}{2x}
+        \cdot \frac cv \cos\alpha \] If we take \(c\) to be infinitely large
+        compared to \(\frac x{dx}\), therefore after a certain time, the
+        wavelength is \(\frac{dx}\nu\)
+      </p>
+      <p>
+        [TODO:Equation] In this form, it can be seen that as \( \lambda\)
+        recedes, it becomes \(\lambda_0\) again. The energy added by external
+        work takes on the color added by each individual oscillation. It simply
+        adds itself to the existing ones.
+      </p>
+
+      <p>
+        If radiation is reflected from diffuse walls, there will be no
+        directional preference in color or energy . In such a case, since the
+        radiation remains permanently in a state of stable equilibrium, the
+        change in color is the same as that caused by a corresponding change in
+        temperature.
+      </p>
+      <p>
+        As we have already seen, in arrangements such as those used to create
+        (delimited) ray cones, adiabatic changes can also be considered if the
+        radiating surface is replaced by a regularly reflecting one. In general,
+        the rays do not maintain their direction here. When the radiating
+        surface becomes very small, we have an arrangement where all rays fall
+        nearly perpendicular to the mirror. In this case, both the color and
+        energy change uniformly for all. These processes are also reversible.
+      </p>
+      <p>
+        Before we proceed to the calculation of the color change, we must prove
+        that in all these cases, the temperature we have defined also has the
+        necessary property of being the integrating denominator of the
+        differential of the energy supplied. This immediately results in the
+        value of entropy. Let us first write the differential of the energy
+        supplied in general terms in the form \[ dQ = Mdx + Ndx \] where \(x\)
+        and \(y\) the two variables determining the state, \(M\) and \(N\) are
+        functions of \(x\) and \(y\), then among the infinite number of
+        integrating denominators, there is one distinguished by the fact that it
+        is a function of \(x\) and \(y\) alone.
+      </p>
+      <p>
+        Now, it has been shown by <em>Mr. Budde</em> [1] that the absolute
+        temperature is the integrating denominator of the heat supplied, being
+        only a function of the arbitrarily chosen temperature scale, independent
+        of the second determining parameter (e.g. volume). If \(x\) is the
+        temperature, then the following condition must be met: \[
+        \frac{\frac{\partial N}{\partial x} - \frac{\partial M}{\partial y}}N =
+        f(x) \] then the integrating denominator determining the temperature is
+        \[ D = \mathrm{const}. e^{\int f(x) dx} \]
+      </p>
+      <p>
+        Let's first consider dispersed radiation from a black body. As we have
+        seen the state is entirely determined by the density \(phi\) and the
+        volume. If we graphically represent density as ordinate and volume as
+        abscissa, then any arbitrary curve can be made of adiabatic and
+        isothermal branches by letting them alternate so frequently so that
+        segments connect to form curves of any desired approximation. We can
+        therefore have any possible value for the density and volume, so they
+        can be introduced as independent variables. In this case density becomes
+        the temperature variable from which the integrating denominator
+        determining the temperature must solely depend.
+      </p>
+      <p>
+        Now, imagine the radiation in a cylinder with unit cross section. Let \(
+        a - x\) be the distance from a movable piston to a fixed base, and \(
+        \varphi(a-x) \) is the internal energy of the system, which we denote as
+        \(U\). When \(x\) is increased by \(dx\), the volume is reduced, so that
+        work is done against the pressure of the rays. According to Boltzmann
+        [2] , the average pressure is \( \frac13 \varphi \) per unit area.
+        Therefore the work done externally \( -\frac13 \varphi dx = dW \).
+      </p>
+      <p>
+        The Clausius equation \( dQ = dU + dW \) becomes \[ dQ = d\varphi(a-x) -
+        \frac43\varphi dx\] Thus equation (6) becomes \[ f(\varphi) =
+        \frac1{4\varphi} \] \[ D = c\varphi^{\frac14} = \vartheta \] where \(c\)
+        denotes a constant.
+      </p>
+      <p>
+        Equation (8) expresses <em>Stefan's law</em> of radiation, which was
+        already derived from Boltzmann.
+      </p>
+      <p>
+        The entropy \(S\) is given by the equation \[ dS = \frac{dQ}\vartheta \]
+        therefore \[ S = S_0 + \frac4{3c}(a-x)\varphi^{\frac34} \]
+      </p>
+      <p>
+        We will now determine the entropy of radiation in a specific direction,
+        as seen in the arrangement in Fig. 2. We restrict ourselves to the case
+        where the radiating surface is small compared to the radius of the
+        sphere. The adiabatic and isothermal volume changes must be carried out
+        by expanding and contracting the entire hemisphere, as otherwise the
+        most divergent rays would not be reflected. Therefore the radiation must
+        not be enclosed between two surfaces.
+      </p>
+      <p>
+        Let \(r\) be the variable radius of the sphere. If we denote the
+        quantity \( \varphi_\alpha r^2 \) as \(\alpha\), then \(\alpha\) is
+        constant within the sphere except for the places near the center; we can
+        neglect the energy supply there, because the volume increases in the
+        third power of the radius, and the density decreases in the square. The
+        internal energy is then \[ U = 2\pi\varphi_\alpha\cdot r^3 = 2\pi\alpha
+        r \] so [TODO: Equation] therefore
+      </p>
+      <div>[[TODO: Insert QUITE a FEW EQUATIONS HERE]]</div>
+      <p>
+        Radiation in a given direction depends on the temperature \(ab\) in the
+        same way as diffuse radiation.
+      </p>
+      <p>
+        Based on Doppler's principle, we see that the change in diffuse
+        radiation in adiabatic process must show the same change in color as
+        that brought about by a change in temperature; I computed this change as
+        a function of temperature in the aforementioned work by using average
+        values.
+      </p>
+      <p>
+        Now we can make the same calculation for radiation in a given direction
+        without having to use averages, because the rays strike the mirror
+        nearly perpendicularly and therefore also suffer the same change. The
+        number \(n\) of reflections on the moving sphere, while \(r\) changes by
+        \(dr\) is given by \[ n= \frac{dr}{2r} \cdot \frac cv \]
+      </p>
+      <p>The resulting wavelength is therefore [TODO:Equation]</p>
+      <p>
+        If we set \[ \lambda_n = \lambda + d\lambda \] then [TODO: Equation]
+      </p>
+      <p>
+        where \( \alpha \) is the value of \(r\) for \(lambda = \lambda_0 \)
+      </p>
+      <p>Now for adiabatic changes \(dQ\) is thus [TODO: Equation]</p>
+      <p>From this it follows that [TODO:Equation]</p>
+      <p>
+        Here \( \varphi\alpha' \) corresponds to the value \(r=\alpha ;
+        \varphi_\alpha' \) belonging to \(\vartheta\), we get [TODO: Equation]
+      </p>
+      <p>
+        This is the same equation I derived using the average value. It follows
+        that the energy belonging to a given color also belongs to the new color
+        after the change. If the boundaries of a narrow spectral band, taken
+        from the normal spectrum, are located at \( \lambda_0 \) and \(
+        \lambda_0 + \delta\lambda_0 \) the new boundaries will be at [TODO:
+        Equation]
+      </p>
+      <p>The overall increase in density will be at [TODO:Equation]</p>
+      <p>
+        As we have seen, it is distributed in such a way that the density of
+        each color is increased according to this equation. Let's set [TODO:
+        Equation] thus [TODO:Equation]
+      </p>
+      <p>
+        Each color \(\lambda_0\) after the change corresponds to a new color
+        \(\lambda\) and an ordinate
+      </p>
+      <p>
+        As soon as the energy distribution in the spectrum of a black body at
+        one temperature is known, it can be derived for any other.
+      </p>
+      <p>
+        It is easy to see that curves of different temperatures must never
+        intersect. For if a color corresponding to a lower temperature possessed
+        a greater energy density than that of higher temperature, then with the
+        help of a surface that preferentially transmits this color, we can
+        transfer energy from the lower to the higher temperature, without any
+        other change.
+      </p>
+      <p>
+        With the help of these results, we can give a curve with a slope steeper
+        than the long wavelength side of the black body energy distribution
+        curve. We start from the equations \[ \lambda\vartheta = \mathrm{const}
+        \] , \[ \varphi = \mathrm{const}\vartheta^5 \]
+      </p>
+      <p>
+        Let \(\frac{d\varphi}{d\lambda}d\lambda\) be the increase that \(phi\)
+        experiences at constant \(theta\) when \(\lambda\) grows by
+        \(d\lambda\). On the other hand, as \(\vartheta\) grows by
+        \(d\vartheta\), each point of the curve \(\varphi(\lambda)\) moves to
+        the side of the smaller \(\lambda\) around the distance [TODO: Equation]
+      </p>
+      <p>
+        In order to ensure that the curves \( \vartheta \) and \( \vartheta +
+        d\vartheta \) do not intersect, we must have [TODO: Equation]
+      </p>
+      <p>Now [TODO:Equation] thus [TODO: Equation]</p>
+      <p>
+        On the side where \( \frac{d\varphi}{d\lambda} \) is negative, i.e from
+        the maximum to the longer wavelengths, the limit value is \(
+        -\frac{d\varphi}{d\lambda} \) everywhere.
+      </p>
+      <p>
+        Each part of this branch of the energy distribution curve must slope
+        less than against the abscissa axis than the curve \[\varphi =
+        \frac{\mathrm{const}}{\lambda^5}\] for any temperature.
+      </p>
+      <p>
+        In Fig.5 the shape of this curve is drawn, which corresponds to a
+        temperature where the maximum of the energy distribution is \[
+        \frac{\varphi max}{\lambda max} = 4 \]
+      </p>
+      <p>
+        Having proved that in the reversible changes by which we determined the
+        entropy of black body radiation, each spectral color is independent, we
+        readily see that the entropy of the radiation of a black body must be
+        composed of the entropies of all the individual spectral colors. The
+        ratio of the energy and entropy of each color must be a constant for all
+        colors: the entropy of the black body monochromatic radiation multiplied
+        by the ratio of the energies, thus [TODO: Equation]
+      </p>
+      <p>
+        The justification for this decomposition lies in the fact that they have
+        the same temperature, and we can calculate the entropy of a heated body
+        of uniform temperature into individual parts according to the ratio of
+        the available energy.
+      </p>
+      <p>
+        n the case of radiation of composite color, the entropy is then TODO...
+        where \(\vartheta\), as we saw above, is to be treated as a function of
+        wavelength. From the definition of the radiation of black bodies, we
+        were able to conclude that entropy has its greatest value here compared
+        to any other color composition. In fact, \[d\mathfrak{T} = 0\] If
+        \(\vartheta = \mathrm{Const.} \)
+      </p>
+      <p>
+        When radiation of a spectral color changes into a mixed color, the
+        entropy increases and this increase is the compensation for the work
+        done. There is a complete analogy for the increase in entropy obtained
+        by mixing separated gases. In the case of gases too, the entropy of the
+        mixture is equal to the sum of the entropies of the individual gases, as
+        if each were present alone. But a difference in the gases allows
+        differences in entropy even at the same temperature, while in this case
+        we are dealing only with the energy itself, which changes the value of
+        the entropy only by differences in its temperature.
+      </p>
+      <p>
+        The maximum value of the work that can be obtained when a given
+        radiation of composition \(\varphi(\lambda)\) passes into the
+        composition of black body radiation was according to equation (2)
+        [TODO:Equation]
+      </p>
+      <p>
+        when determining the radiation entropy in a given direction with
+        different color compositions arising by itself.
+      </p>
+
+      <h2>Reversible and Irreversible Processes</h2>
+      <p>
+        From the considerations made so far, we can determine the entropy for
+        any given type of ray. The processes involved in increasing and
+        decreasing the volume of radiation are reversible when the energy of
+        each color does maximum work. We can see from the following observation
+        that the radiation pressure with an existing temperature difference
+        really gives the greatest work in accordance with
+        <em>Carnot's principle</em> only due to the temperature difference.
+      </p>
+      <p>
+        If we have radiation from black bodies of density \(\varphi_1\) and
+        \(\varphi_2 \gt \varphi_1 \) in two right-angled parallelepiped spaces
+        with diffuse reflecting walls lying next to each other, then we could
+        extract a quantity of work without changing the volume of the entire
+        system by letting the partition wall, which we imagine as movable and
+        having a unit area, to do work under the downwards pressure \(\frac13
+        (\varphi_1 - \varphi_2) until equal pressure is established on both
+        sides. Then the temperature is also the same on both sides; let \( b\)
+        be the distance of the movable partition from the opposite one in the
+        region where \( \varphi_2\) prevails, and let \( \alpha\) be the same
+        magnitude in the other regions. The movable partition moves parallel to
+        itself until the change in density \( \varphi\) also becomes equal to
+        the variable \( \varphi_2' \) \)
+      </p>
+      <p>
+        The initial value of the energy in region 1 is \[ U_1 = \alpha\varphi \]
+        during the change [TODO:Equation] likewise [TODO:Equation] also
+        [TODO:Equation] The work done during the displacement \(dx\) is
+        [TODO:Equation] therefore [TODO:Equation] similarly, [TODO: Equation]
+        After the change, it should be [TODO:Equation] and is thus
+        [TODO:Equation]
+      </p>
+      <p>The work gained externally is [TODO:Equation]</p>
+      <p>
+        If the change in 2 is not adiabatic, but isothermal by connection with a
+        radiating body of high heat capacity, then \(\varphi_2'\) remains
+        constant \(\varphi_2\), it becomes [TODO:Equation]
+      </p>
+      <p>
+        In this process, the quantity of heat at \( \vartheta_1\) is converted
+        into work, while the quantity \(\varphi_1 \alpha
+        \frac{\vartheta_2}{\vartheta_1} \) has decreased in temperature from \(
+        \vartheta_1 \) to \( \vartheta_2 \). According to the well-known
+        theorems of Clausius, the maximum possible work is obtained.
+      </p>
+      <p>
+        It follows from these considerations that all the changes in radiation
+        are irreversible when radiation increases its volume without work.
+        Hence, it follows that the free emission of radiation is an irreversible
+        process.
+      </p>
+      <p>
+        But even the mixing of radiation of different colors is irreversible, in
+        the same way that mixing two gases without work is irreversible. In both
+        cases the entropy increases.
+      </p>
+      <p>
+        If we allow a diffuse mirror to move freely an enclosure filled with
+        black body radiation, then it could be moved without any work, because
+        pressure on both sides always remains the same. Consequently, no change
+        in color could occur as such a change would require work.
+      </p>
+      <p>
+        The changes in temperature according to
+        <em>Doppler's principle</em> balance out in terms of average value at
+        the front and back surface, because on average each quantum of energy is
+        reflected from the front and back surface an equal number of times. This
+        case clearly illustrates how the state demanded by the second law and
+        thermal equilibrium is only established on average.
+      </p>
+      <p>
+        It is also possible to draw the conclusion, which we already derived
+        from other considerations above, that it is not possible to influence
+        the energy of individual colors in thermal radiation.
+      </p>
+      <p>
+        Hence, there cannot be a surface which allows only radiation between two
+        specific wavelengths to pass through fully while reflecting all others,
+        regardless of direction. If such a surface existed, it could divide
+        black body radiation into two parts. Moving the plate would not change
+        the color and energy of the transmitted rays, but would influence the
+        other rays. Let us choose the plate so that the wavelength \( \lambda =
+        a \) and \( \lambda = b \), which delineate the color the transmitted
+        energy, lie on the maximum side of the energy distribution curve, where
+        the intensity diminishes significantly towards the longer wavelengths.
+      </p>
+      <p>
+        Let \( b \gt a \). On the side of the plate where the radiation is
+        compressed, wavelengths outside the range of \(a\) and \(b\) become
+        shorter, and the energy of colors with wavelength slightly larger \(b\)
+        now acquire wavelengths that fall between \(a\) and \(b\), allowing them
+        to freely propagate through space.
+      </p>
+      <p>
+        Likewise, in the case of \(\alpha\), the adjacent colors of shorter
+        wavelengths will fall between \( a\) and \(b\) in the side of expanding
+        radiation and spread through the plate. Since \( \varphi_a \gt \varphi_b
+        \), more energy from the side where radiation is expanding would reach
+        the other side than vice versa. This excess would add to the already
+        excess density caused by compression, and would press against a perfect
+        mirror in place of the surface.
+      </p>
+      <p>
+        If you take the path of the plate in the opposite direction with the
+        mirror, you would get more work than that used to move the plate, and
+        you would also retain a change in color.
+      </p>
+      <p>
+        One can therefore only ascribe to such a lamella the properties that
+        <em>Kirchhoff</em> does, namely that it preferentially lets radiation of
+        one color through, and preferentially reflects others, but there is
+        always a finite ratio between transmitted and reflected rays. Therefore
+        the process just described is impossible.
+      </p>
+      <p>
+        We can draw another conclusion from a real plate that confirms the
+        result obtained above: homogeneous diffuse radiation remains homogeneous
+        during an adiabatic change of volume. We saw that the free motion of a
+        mirror through the radiation will not affect the color. The compensation
+        for the color change must be done for each color separately, according
+        to
+        <em>Doppler's principle</em>, without the superposition of different
+        colors. If this were to occur, then by freely moving a plate that allows
+        certain colors to pass through more easily than others, could achieve a
+        situation with an overlap of more strongly reflected colors. This would
+        result in a change in the color composition. Thus the maximum of the
+        energy distribution curve would change more strongly changed, and if
+        this was accompanied by an energy exchange with other colors, the
+        maximum would give off more energy than it would receive. The
+        consequence would be a flattening of the energy distribution curve. If
+        on the other hand each color is balanced, it would make no difference
+        whether perfect mirrors or semi-transparent surfaces are moved.
+      </p>
+      <p>
+        Finally, let's take a look at the various processes in which work is
+        done by radiation. The photochemical effects, the generation of galvanic
+        current through the illumination of electrodes, the production of
+        electric charges under the influence of ultraviolet light as observed by
+        <em>Hallwachs and Righi</em>, are examples of such transformation. As
+        these experiments are only qualitative, it's not clear whether they
+        achieve the maximum possible work.
+      </p>
+      <p>
+        With fluorescence, the color of the incident light is changed. Since
+        this involves visible rays, and the maximum energy distribution of black
+        body radiation at the intensities which fall on the florescent bodies is
+        in the infrared, the entropy decreases towards the more visible rays. If
+        florescence follows <em>Stoke's law</em>, i.e the wavelength increases,
+        then the process corresponds to an increase in entropy. In substances
+        that that behave in the opposite manner, the transformation cannot occur
+        without compensation, which is easily account for in simultaneous
+        absorption. It follows that florescent substances must change their
+        properties at temperatures where they are hot enough to emit visible
+        rays. Because if rays of the same temperature fall on them, compensation
+        through absorption is no longer possible.
+      </p>
+    </main>
+    <section id="footnotes">
+      <p id="fn1">
+        <a href="#fn1">1</a>
+        <span>
+          <em>E. Wiedemann</em>, Wied. Ann. <strong>34.</strong> p. 447. 1888;
+          <strong>38.</strong> p. 487. 1889.
+        </span>
+      </p>
+      <p id="fn2">
+        <a href="fn2">2</a>
+        <span>
+          <em>W. Wien</em>, Wied. Ann. <strong>45.</strong> p. 712. 1892.
+        </span>
+      </p>
+    </section>
+    <section class="footnote_area">
+      <button id="fn_close" onclick="closeFootnote()">x</button>
+      <p id="fn_content">Example Content</p>
+    </section>
+  </body>
+</html>
