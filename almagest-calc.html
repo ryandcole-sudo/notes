@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Almagest Calculator</title>
+        <style>
+        body{
+            font-family: sans-serif;
+            margin-bottom: 35vh;
+            margin-left: 20px;
+        }
+        .toggle-button{
+            display:none;
+        }
+        .toggle-button+label{
+            display: inline-block;
+            padding:4px;
+            margin:4px;
+            width: 30px;
+            text-align: center;
+            border: 1px solid #445;
+            cursor: pointer;
+        }
+        .toggle-button:checked+label{
+            background: #ccc;
+            border: 2px solid black;
+        }
+        </style>
+        <script>
+            /* Adjustable settings */
+            const options = {
+                displaySg: false, //Print outputs in sexagesimal format
+                base60chord:false, //Display and input chords in base 60
+            };
+
+            function mod(a,b){
+                return a%b;
+            }
+            function angle(a){
+                return mod(a,360);
+            }
+
+             /* Sexagesimal functions*/
+
+            //Convert a sexagesimal number to decimal
+            function sgd(number){
+                if(typeof(number) != "string"){
+                    number = String(number);
+                }
+
+                number = number.trim(); // Remove whitespace
+                //Seperate the integer and fractional parts
+                const parts = number.split(";");
+
+                if(parts.length > 2){
+                    console.error("More than 2 semicolons in sexagesimal number");
+                    return;
+                }
+
+                //Main case, with 2 numbers whole and part
+                if(parts.length == 2){
+                    const whole = parts[0];
+                    const fraction = parts[1];
+
+                    const wholeNum = frac(whole);
+                    const fracParts = fraction.split(",");
+
+                    let fracNum = 0;
+
+                    for(let i=0; i<fracParts.length;i++){
+                        fracNum += frac(fracParts[i])*Math.pow(1/60,i+1);
+                    }
+
+                    return wholeNum + fracNum;
+
+                }
+
+                //Either a fractional part or decimal
+                if(parts.length == 1){
+                    numParts = parts[0].split(",");
+
+                    if(numParts.length == 1){
+                        //Whole number
+                        return frac(numParts[0]);
+                    }else{
+                        let fracNum = 0;
+
+                        for(let i=0; i<numParts.length;i++){
+                            fracNum += frac(numParts[i])*Math.pow(1/60,i+1);
+                        }
+                        return fracNum;
+                    }
+                }
+
+            }
+
+            //Convert decimal to sexagesimal
+            function dsg(number, prec){
+                if(!prec){
+                    prec = 3;
+                }
+                const  whole = Math.floor(number);
+                const parts = [];
+
+                let fraction  = number - whole;
+
+                if(fraction != 0){
+                    for(let i = 0; i < prec-1; i++){
+                        fraction *= 60;
+                        const whole = Math.floor(fraction) 
+                        fraction = fraction - whole;
+                        
+
+                        parts.push(whole);
+
+                        if(fraction < Math.pow(1/60,prec+1)){
+                            break;
+                        }
+                    }
+                }
+
+                if(parts.length == 0){
+                    return whole.toString();
+                }
+
+                const string = whole + ";" + parts.join(",");
+                return string;
+            }
+
+            // Fractional numbers of the form 5 1/2
+            function frac(number){
+                if(typeof number !== "string"){
+                    number =  String(number);
+                }
+
+                const parts = number.split(" ");
+
+                if(parts.length === 1){
+                    // It might be a fraction or a whole number
+                    if(number.includes("/")){
+                        const [num, den] = number.split("/").map(Number);
+                        return num / den;
+                    }else{
+                        const num = Number(number);
+                        return num;
+                    }
+                }else if(parts.length === 2){
+                    // Mixed numbers
+                    const whole = Number(parts[0]);
+
+                    const [num, den] = parts[1].split("/").map(Number);
+                    return whole + num/den;
+                }else{
+                    throw "Invalid Fraction";
+                    return NaN;
+                }
+            }
+
+            // Return the ordinal form of a number
+            function ordinal(number){
+                let th = "th";
+                if(number % 10 == 1 && number % 100 != 11){
+                   th = "st"; 
+                }
+                if(number % 10 == 2 && number % 100 != 12){
+                   th = "nd"; 
+                }
+                if(number % 10 == 3 && number % 100 != 13){
+                   th = "rd"; 
+                }
+                return number + th;
+            }
+
+            //Print days for a calendar
+            function renderDays(number){
+                let dateHTML = "";
+                let randomId = "date-" + Math.round(Math.random()*100000);
+                for(let i=1; i<=number;i++){
+                    dateHTML += `<input type="radio" class="toggle-button" name="${randomId}" value="${i}" id="${randomId}-${i}"><label for="${randomId}-${i}">${i}</label>`;
+                    if(i%5 == 0){
+                        dateHTML += "<br>";
+                    }
+                }
+                return dateHTML;
+            }
+
+            // Calculate days for the Egyptian Calendar given month and days
+            function calculateDays(month, days){
+                let totalDays = (month-1)*30 + days;
+                return totalDays;
+            }
+            
+            // Calculate number days since epoch for egyptian calendar
+            function calculateEpochDays(month,days,years){
+                let daysInYear = calculateDays(month,days);
+                let epochDays = (years-1)*365 + daysInYear-1;
+
+                return epochDays;
+            }
+
+            // Return the date in current calendar (Julian,  Gregorian) for
+            function dateFromEpoch(date,days){
+                const datetime = date.getTime(); //Time in milliseconds
+                const newtime = datetime + 86400000*days;
+                return new Date(newtime);
+            }
+
+            // Calculate the number of leap years between two year dates in the Julian Calendar (with astronomical (negative) numbering) 
+            function nLeapYears(start, end){
+                let leap_start = start + (4 - start%4)%4;
+                let leap_end = end - end%4;
+
+                let leapYears = (leap_end - leap_start)/4 + 1;
+                return leapYears;
+                
+            }
+
+            // Calculate the integer number of julian years
+            function integerYears(days){
+                return Math.floor(days/365.25);
+            }
+
+            // Julian Date Class
+            function JulianDate(year,month,day){
+                //March 1,year 0 epoch
+                const daysArray = [31,30,31,30,31,31,30,31,30,31,31,28];
+                const monthArray = ["Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb"];
+
+                const yearLength = 365.25;
+
+                let years = 0;
+                let days = 0;
+                let months = 0;
+                let epochDays = 0;
+
+                // Function overloading
+                if(!month){
+                    if(typeof(year) == "number"){
+                        // Then this is really supposed to be the number of epoch days
+                        epochDays = year;
+                        calculateYDM();
+                    }
+                }else{
+                    calculateEpoch();
+                }
+                
+                    this.years = years;
+                    this.days = days;
+                    this.months = months;
+                    this.epochDays = epochDays;
+
+                    this.toString = print;
+
+
+                // Calculate the epoch days from the year, month and days
+                function calculateEpoch(){
+                    // Calculate integer days in full year from epoch
+                    const yearDays = Math.floor(1+yearLength*(year-1)) + 365;
+
+                    // Convert Month to format
+                    if(typeof(month) == "string"){
+                    let _month = monthArray.indexOf(month);
+                    if(_month < 0){
+                        throw "Julian Date Error: Invalid month "+month;
+                    }
+                    month = _month;
+                    }
+
+                    // Calculate days to month
+                    let monthDays = 0;
+                    for(let i = 0; i < month;i++){
+                        monthDays+= daysArray[i];
+                    }
+
+                    epochDays = yearDays + monthDays + day;
+                    years = year;
+                    days = day;
+                    months = month;
+                }
+
+                function calculateYDM(){
+                    years = Math.floor((epochDays-1462)/365.25) + 4;
+                    const isLeapYear = (years%4) == 0;
+
+                    const daysInYear = epochDays - Math.floor(365.25*years)  - (isLeapYear ?0:1);
+
+                    //Cycle through months
+                    let daysInMonth = 0;
+                    let totalDays = daysInYear;
+                    for(let i = 0; i < daysArray.length; i++){
+                       totalDays -= daysArray[i]; 
+                       
+                       // Leap year logic
+                       if(isLeapYear){
+                        daysArray[11] = 29;
+                       }
+
+                       if(totalDays <= 0){
+                         totalDays += daysArray[i];
+                         months = i;
+                         days = totalDays;
+                         break;
+                       }
+                    }
+                    daysInMonth = totalDays;
+                }
+
+                function print(){
+                    let day = this.days
+                    let month = monthArray[this.months];
+                    let year = this.years;
+                    return `${year} ${month}. ${day}`;
+                }
+            }
+
+            // Function to convert time given in years, days, hours, minute, seconds to fractions of a day
+            function time(str){
+                // Time format example: 29d 5h 15m 20s
+
+                const parts = str.split(/[ydhms]/);
+                const quantities = [0,0,0,0,0];
+
+                const units = "ydhms".split("");
+
+                // If no units given assume days
+                if(parts.length == 1){
+                    return sgd(parts[0]);
+                }
+
+                let i = 0;
+                let prev_index = 0;
+                
+                units.forEach( (unit,j) => {
+                    // The corresponding quantity exists and is in the correct order in relation to the previous
+                    if(str.indexOf(unit) > prev_index){
+                        quantities[j] = parts[i];
+                        prev_index = str.indexOf(unit);
+                        i++;
+                    }
+                });
+
+                const years = sgd(quantities[0]);
+                const days = sgd(quantities[1]);
+                const hours = sgd(quantities[2]);
+                const minutes = sgd(quantities[3]);
+                const seconds = sgd(quantities[4]);
+
+                const time = 365*years + days + hours/24 + minutes/1440 + seconds/86400;
+                return time;
+
+            }
+
+
+            // Function to find the chord of a given arc
+            function crd(arc){
+                return 2*Math.sin(arc*Math.PI/360);
+            }
+            function sin(angle){
+                return Math.sin(angle*Math.PI/180);
+            }
+
+            //Function to find the arc of a given chord
+            function arc(crd){
+                return 360*Math.asin(crd/2)/Math.PI;
+            }
+            function asin(x){
+                return Math.asin(x)*180/Math.PI;
+            }
+
+            // Draw a diagram of the given chord and arc
+            function drawChord(arc){
+                const chord = crd(arc);
+
+                const canvas = document.querySelector("#chords .diagram");
+                const ctx = canvas.getContext("2d");
+
+                ctx.clearRect(0,0,500,500);
+
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = "#444";
+                ctx.beginPath();
+                ctx.arc(100,100,90,0,2*Math.PI);
+                ctx.stroke();
+
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = "black";
+                ctx.beginPath();
+                ctx.arc(100,100,90,Math.PI*(1-arc/360), Math.PI*(1+arc/360));
+                ctx.stroke();
+
+                // Draw the chord
+                x1 = 100 + 90*Math.cos(Math.PI*(1-arc/360))
+                y1 = 100 + 90*Math.sin(Math.PI*(1-arc/360))
+                x2 = 100 + 90*Math.cos(Math.PI*(1+arc/360))
+                y2 = 100 + 90*Math.sin(Math.PI*(1+arc/360))
+
+                ctx.beginPath();
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 3;
+
+                ctx.moveTo(x1,y1);
+                ctx.lineTo(x2,y2);
+                ctx.stroke();
+
+            }
+
+            // Declination
+            function calculateDeclination(longitude,obliquity){
+                const sin_dec = sin(obliquity)*sin(longitude);
+                const declination = asin(sin_dec);
+                return declination;
+            }
+            function calculateLongitudeFromDeclination(declination,obliquity){
+                const sin_long = sin(declination)/sin(obliquity);
+                const longitude = asin(sin_long);
+                return longitude;
+            }
+
+            // Right ascension
+            function calculateRightAscensionFromDeclination(declination,obliquity){
+                const sin_ra = (sin(90 - obliquity)*sin(declination) )/( sin(obliquity) * sin(90 - declination));
+                const ra = asin(sin_ra);
+                return ra;
+            }
+            function calculateDeclinationFromRightAscension(ra,obliquity){
+                const tan_dec = sin(obliquity)*sin(ra)/sin(90 - obliquity);
+                
+                //Arc tangent
+                const dec = asin(tan_dec/Math.sqrt(1+tan_dec**2));
+                return dec;
+            }
+
+            // Rising Amplitude
+            function calculateRisingAmplitude(longestDay,declination){
+                const timeDegrees = longestDay*360;
+
+                const cos_ra = sin(90 + declination)*sin(timeDegrees/2);
+                const ra = 90 - asin(cos_ra);
+                return ra;
+            }
+
+             /* Display classes */
+             function display(number,format){
+                switch(format){
+                    case "chord":
+                        if(options.base60chord){
+                            number = number*60;
+                        }
+                    case "number":
+                    default:
+                }
+                if(options.displaySg){
+                    return dsg(number);
+                }else{
+                    return number;
+                }
+             }
+
+            /*Input classes */
+            function input(number,format){
+                switch(format){
+                    case "chord":
+                        if(options.base60chord){
+                            return(number/60);
+                        }else{
+                            return number;
+                        }
+                        break;
+                    default:
+                        return number;
+                }
+            }
+
+            /*Settings*/
+
+            // Load settings
+            function loadSettings(){
+                document.getElementById("settings-option-base60").checked = options.base60chord;
+                document.getElementById("settings-option-sexagesimal").checked = options.displaySg;
+            }
+
+            // Save settings
+            function saveSettings(){
+                options.base60chord = document.getElementById("settings-option-base60").checked;
+                options.displaySg = document.getElementById("settings-option-sexagesimal").checked;
+            }
+
+            function main(){
+
+                // Choose a calculator
+                currentCalc();
+                window.addEventListener("hashchange", function(){
+                    currentCalc();
+                });
+
+                // Sexagesimal calculator
+                document.querySelector("#sexagesimal .number").addEventListener("change", function(e){
+                    document.querySelector("#sexagesimal .result").innerText = sgd(e.currentTarget.value);
+                });
+
+                // For calendar and dates
+                document.querySelector("#calendar .days").innerHTML = renderDays(30);
+                document.querySelector("#calendar .month").addEventListener("change", function(e){
+                    if(e.currentTarget.value != 13){
+                        document.querySelector("#calendar .days").innerHTML = renderDays(30);
+                    }else{
+                        document.querySelector("#calendar .days").innerHTML = renderDays(5);
+                    }
+                });
+                document.querySelector("#calendar .egyptian").addEventListener("change", function(e){
+                    const daysDom = document.querySelector("#calendar .days :checked");
+                    const monthDom = document.querySelector("#calendar .month");
+
+                    if(daysDom && monthDom){
+                        const month = Number(monthDom.value);
+                        const days = Number(daysDom.value);
+                    
+                        document.querySelector("#calendar .day").innerText = calculateDays(month,days);
+                    }
+                });
+                document.querySelector("#calendar .epoch").addEventListener("change", function(e){
+                    const daysDom = document.querySelector("#calendar .days :checked");
+                    const monthDom = document.querySelector("#calendar .month");
+                    const yearsDom = document.querySelector("#calendar .years");
+                    const epochChoiceDom = document.querySelector("#calendar .epoch-choice");
+                    
+                    if(daysDom && monthDom){
+                        const month = Number(monthDom.value);
+                        const days = Number(daysDom.value);
+                        const years = Number(yearsDom.value);
+                        const epochChoice = epochChoiceDom.value;
+
+                        let epochDays = 0; //Default Feb 28, -1 Epoch
+                        
+                        switch(epochChoice){
+                            case "Nabonassar":
+                                // Feb 26, -746
+                                epochDays = new JulianDate(-746,"Feb", 26).epochDays;
+                                break;
+                            default:
+                        }
+
+                        const daysFromEpoch = calculateEpochDays(month,days,years);
+                        const date = new JulianDate(daysFromEpoch + epochDays);
+
+                        
+                        // Calculate date in Julian calendar from a given epoch
+
+                        document.querySelector("#calendar .epoch-days").innerText = daysFromEpoch;
+                        document.querySelector("#calendar .date-julian").innerText = date.toString()
+                    }
+                });
+
+                // Zodiac Signs Calculator
+                document.querySelectorAll("#zodiac .degree,.sign").forEach(input => {
+                    input.addEventListener("change", function(e){
+                        const degreesEl = document.querySelector("#zodiac .degree");
+                        const signsEl = document.querySelector("#zodiac .sign");
+                        const longEl = document.querySelector("#zodiac .longitude");
+
+                        const degrees = sgd(degreesEl.value);
+                        const sign = sgd(signsEl.value);
+                        
+                        const longitude = degrees + sign;
+
+                        longEl.value = display(longitude);
+                    });
+                });
+                document.querySelector("#zodiac .longitude").addEventListener("change", function(e){
+                    const degreesEl = document.querySelector("#zodiac .degree");
+                    const signsEl = document.querySelector("#zodiac .sign");
+                    const longEl = document.querySelector("#zodiac .longitude");
+
+                    const longitude = longEl.value;
+
+                    const sign = 30*Math.floor(Math.round(longitude)/30);
+                    const degrees = mod(longitude,30);
+
+                    signsEl.value = sign;
+                    degreesEl.value = degrees;
+                });
+
+                //Chord calculator
+                document.querySelector("#chords .chord").addEventListener("change", function(e){
+                    const chord = input(sgd(e.currentTarget.value),"chord");
+                    document.querySelector("#chords .arc").value = display(arc(chord));
+                    drawChord(crd(arc))
+                });
+                document.querySelector("#chords .arc").addEventListener("change", function(e){
+                    const arc = sgd(e.currentTarget.value);
+                    document.querySelector("#chords .chord").value = display(crd(arc),"chord");
+                    drawChord(arc);
+                });
+                drawChord(0);
+
+                //Obliquity
+                document.querySelector("#obliquity form").addEventListener("change", function(e){
+                    const ws = sgd(document.querySelector("#obliquity .ws").value);
+                    const ss = sgd(document.querySelector("#obliquity .ss").value);
+
+                    if(ws && ss){
+                        document.querySelector("#obliquity .solstice").innerText = display(Math.abs(ws - ss));
+                        document.querySelector("#obliquity .obliquity").innerText = display(Math.abs((ws - ss)/2));
+                        document.querySelector("#obliquity .equinox").innerText = display(Math.abs((ws + ss)/2));
+                        document.querySelector("#obliquity .latitude").innerText = display(Math.abs(90 - (ws + ss)/2)) + ( ss >= ws?"N":"S");
+                    }
+                });
+
+                // Declination
+                document.querySelector("#declination .longitude").addEventListener("change", function(e){
+                    const longitude = sgd(e.target.value);
+                    const obliquity = sgd(document.querySelector("#declination .obliquity").value);
+
+                    const declination = calculateDeclination(longitude,obliquity);
+
+                    document.querySelector("#declination .declination").value = display(declination);
+
+                });
+                document.querySelector("#declination .declination").addEventListener("change", function(e){
+                    const declination = sgd(e.target.value);
+                    const obliquity = sgd(document.querySelector("#declination .obliquity").value);
+
+                    const longitude = calculateLongitudeFromDeclination(declination,obliquity);
+                    document.querySelector("#declination .longitude").value = display(longitude);
+                });
+
+                //Right Ascension
+                document.querySelector("#right-ascension .declination").addEventListener("change", function(e){
+                    const dec = sgd(e.target.value);
+                    const obliquity = sgd(document.querySelector("#right-ascension .obliquity").value);
+
+                    const ra = calculateRightAscensionFromDeclination(dec,obliquity);
+
+                    document.querySelector("#right-ascension .ra").value = display(ra);
+
+                });
+                document.querySelector("#right-ascension .ra").addEventListener("change", function(e){
+                    const ra = sgd(e.target.value);
+                    const obliquity = sgd(document.querySelector("#right-ascension .obliquity").value);
+
+                    const declination = calculateDeclinationFromRightAscension(ra,obliquity);
+                    document.querySelector("#right-ascension .declination").value = display(declination);
+                });
+
+                //Rising Amplitude
+                document.querySelector("#rising-amplitude .day-length").addEventListener("change", function(e){
+                    const dayLength = time(e.target.value);
+                    const declination = sgd(document.querySelector("#rising-amplitude .declination").value);
+
+                    const ra = calculateRisingAmplitude(dayLength,declination);
+                    document.querySelector("#rising-amplitude .amplitude").value = display(ra);
+
+                });
+                
+
+
+                // Prevent default submissions
+                document.querySelectorAll("form").forEach(form => {
+                    form.addEventListener("submit", function(e){
+                        e.preventDefault();
+                    });
+                });
+
+                // Settings
+                document.querySelector("#settings form").addEventListener("change", function(e){
+                    saveSettings();
+                });
+                loadSettings();
+
+            }
+
+            function changeCalc(id){
+                const sections = document.querySelectorAll(".main section");
+
+                sections.forEach( section => {
+                    if(section.id === id){
+                        section.style.display = "block";
+                    }else{
+                        section.style.display = "none";
+                    }
+                });
+            }
+
+            // Determine current calculator by the url hash
+            function currentCalc(){
+                const id = window.location.hash.replace('#','');
+                changeCalc(id);
+            }
+
+            window.onload = main;
+
+        </script>
+</head>
+<body>
+    <nav class="sidebar">
+        <ul>
+          <li><a href="#sexagesimal">0.4a Sexagesimal</a></li>
+          <li><a href="#calendar">0.4d Calendar and Dates</a></li>
+          <li><a href="#zodiac">0.7 Zodiac Signs to Ecliptic Longitude</a></li>
+          <li><a href="#chords">1.11 Length of a chord (trigonometry)</a></li>
+          <li><a href="#obliquity">1.12 Obliquity of the ecliptic</a></li>
+          <li><a href="#declination">1.14 Declination of the sun</a></li>
+          <li><a href="#right-ascension">1.16 Right ascension from Declination</a></li>
+          <li><a href="#rising-amplitude">2.2 Rising Amplitude of the sun</a></li>
+          <li><a href="#settings">Settings</a></li>
+        </ul>
+    </nav>
+    <main class="main">
+        <section class="section a-0" id="sexagesimal">
+            <h2> Sexagesimal Calculator </h2>
+            <form>
+                <input type="text" class="number">
+                <p class="result"></p>
+                <input type="submit" value="Enter"></input>
+
+            </form>
+        </section>
+        <section id="calendar">
+            <h2> Egyptian Calendar </h2>
+            <label>Month:</label>
+            <form class="egyptian">
+            <select class="month">
+                <option value="1">I - Thoth</option>
+                <option value="2"> II - Phaophi </option>
+                <option value="3">III- Athyr</option>
+                <option value="4">IV- Choiak</option>
+                <option value="5">V- Tybi</option>
+                <option value="6">VI- Mechir</option>
+                <option value="7">VII- Phamenoth</option>
+                <option value="8">VIII - Pharmouthi</option>
+                <option value="9">IX - Pachon</option>
+                <option value="10">X - Payni</option>
+                <option value="11">XI- Epiphi</option>
+                <option value="12">XII - Mesore</option>
+                <option value="13">Epigominal</option>
+            </select>
+            <fieldset class="days">
+            </fieldset>
+            </form>
+            <p>
+            Day of the year: <span class="day"></span>
+            </p>
+            <details>
+            <summary>
+            Epoch
+            </summary>
+            <h2> Epoch calculation </h2>
+            <form class="epoch">
+                Epoch:
+                <select class="epoch-choice">
+                    <option value="Nabonassar">Nabonassar</option>
+                </select>
+                <br>
+                Years since epoch:
+                <input type="number" class="years">
+                <br>
+                Days since epoch:
+                <span class="epoch-days"></span>
+                <br>
+                Date:
+                <span class="date-julian"></span>
+            </form>
+            </details>
+
+        </section>
+
+        <section id="zodiac">
+            <h2> Zodiac to Ecliptic Longitude </h2>
+            <form>
+                <label>Zodiac Degrees:</label>
+                <input type="text" class="degree">
+                <select class="sign">
+                    <option value="0">♈️ - Aries</option>
+                    <option value="30">♉️ - Taurus</option>
+                    <option value="60">♊️ - Gemini</option>
+                    <option value="90">♋️ - Cancer</option>
+                    <option value="120">♌️ - Leo</option>
+                    <option value="150">♍️ - Virgo</option>
+                    <option value="180">♎️ - Libra</option>
+                    <option value="210">♏️ - Scorpius</option>
+                    <option value="240">♐️ - Sagittarius</option>
+                    <option value="270">♑️ - Capricornus</option>
+                    <option value="300">♒️ - Aquarius</option>
+                    <option value="330">♓️ - Pisces</option>
+                </select>
+                <br>
+                <label>Degrees Longitude:</label>
+                <input type="text" class="longitude">
+            </form>
+        </section>
+
+        <section id="chords">
+            <h2>Chords and Arcs </h2>
+            <ul class="explain">
+                <li>A line running through a circle is refered to as a <em>chord</em>. The part of the cirmcumfrence cut by this line is called the <em>arc</em></li>
+                <li>The chords of a few arcs can be found from Euclid's geometry.</li>
+                <li>Other arcs can be found by combining half-angle, and sum and difference formulas. The procedure which Ptolemy uses to find these formulas is called <em>Ptolemy's theorem</em></li>
+            </ul>
+            <label>Arc:</label>
+            <input type="text" class="arc">
+            <br>
+            <label>Chord:</label>
+            <input type="text" class="chord">
+            <br>
+
+            <canvas class="diagram" height="200" width="200">
+            </canvas>
+
+        </section>
+
+        <section id="obliquity">
+        <h2>Obliquity of Ecliptic and Terrestrial Latitude</h2>
+        <p class="explain">
+            <ul>
+            <li>A ring is aligned to the line of the meridian, where the 
+            sun reaches its highest point in the sky (noon)</li> 
+            <li>Degree markings on this instrument allow us to  measure 
+            the elevation angle of the sun at noon. </li>
+            <li>Measure the highest elevation (summer solstice) 
+            and lowest elevation (winter solstice) of the sun, throughout
+            the year, for your location </li>
+            </ul>
+        </p>
+            <p>Enter elevation angles in degrees:</p>
+            <form>
+            <label>Summer solstice:</label>
+            <input type="number" class="ss">
+            <br>
+            <label>Winter solstice:</label>
+            <input type="number" class="ws">
+            <br>
+            </form>
+
+            <label>Arc between solstices:</label>
+            <span class="solstice"></span>
+            <br>
+
+            <label>Obliquity:</label>
+            <span class="obliquity"></span>
+            <br>
+
+            <label>Equinox elevation:</label>
+            <span class="equinox"></span>
+            <br>
+
+            <label>Latitude (pole elevation):</label>
+            <span class="latitude"></span>
+            <br>
+            
+        </section>
+
+        <section id="declination">
+            <h2> Declination from Ecliptic longitude </h2>
+            <form>
+                <label>Ecliptic longitude:</label>
+                <input type="text" class="longitude">
+                <br>
+                <label>Declination:</label>
+                <input type="text" class="declination">
+                <br>
+
+                <details>
+                 <summary>More</summary>
+                 <label>Obliquity:</label>
+                 <input type="text" class="obliquity" value="23;51,20">
+                </details>
+            </form>
+        </section>
+        
+        <section id="right-ascension">
+        <h2>Right ascension</h2>
+        <form>
+        <label>Declination:</label>
+        <input type="text" class="declination">
+        <br>
+        <label>Right ascension:</label>
+        <input type="text" class="ra">
+        <br>
+
+        <details>
+            <summary>More</summary>
+            <label>Obliquity:</label>
+            <input type="text" class="obliquity" value="23;51,20">
+        </details>
+        
+        </form>
+        
+        </section>
+
+        <section id="rising-amplitude">
+           <h2> Rising Amplitude of the sun </h2> 
+           <p>Determine the angle that the sun rises in relation to true east</p>
+           <label>Length of the longest day:</label>
+           <input type="text" class="day-length">
+           <br>
+           <label>Declination:</label>
+           <input type="text" class="declination">
+           <br>
+           <label>Rising Amplitude:</label>
+           <input type="text" class="amplitude">
+           <br>
+        </section>
+
+        <section id="settings">
+            <h2> Settings </h2>
+            <form>
+                <br>Numbers:<br>
+                <input id="settings-option-sexagesimal" type="checkbox">
+                <label for="settings-option-sexagesimal">Use sexagesimal instead of decimal for fractional numbers</label>
+                <br>
+                <br>Chords:<br>
+                <input id="settings-option-base60" type="checkbox">
+                <label for="settings-option-base60">Use a radius of 60 instead of unit radius.</label>
+                <br>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
