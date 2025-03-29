@@ -32,13 +32,56 @@
             const options = {
                 displaySg: false, //Print outputs in sexagesimal format
                 base60chord:false, //Display and input chords in base 60
+                timeHours: true, // Display time in hours, minutes and seconds
             };
 
             function mod(a,b){
-                return a%b;
+                return ((a%b)  + b) %b;
             }
             function angle(a){
                 return mod(a,360);
+            }
+
+            // Function to find the inverse of a given function with numerical output
+            function inverse(f,y, tolerance = 1e-9, maxIterations = 100){
+                // Find initial interval
+                let low = -10;
+                let high = 10;
+
+                if(f(low) > f(high)){
+                    [low, high] = [high,low];
+                }
+
+                let i = 0;
+                while(f(low) > y && i<1000){
+                    low *= 2;
+                    i++;
+                }
+                i = 0;
+                while(f(high) < y && i<1000){
+                    high *= 2;
+                    i++;
+                }
+
+                // Bisection method
+                let iterations = 2;
+                while(iterations < maxIterations){
+                    const mid = (low + high)/2;
+                    const fMid = f(mid);
+
+                    if(Math.abs(fMid -y) < tolerance){
+                        return mid;
+                    }
+
+                    if(fMid < y){
+                        low = mid;
+                    } else{
+                        high = mid;
+                    }
+
+                    iterations++;
+                }
+                return NaN; //No inverse found within tolerance 
             }
 
              /* Sexagesimal functions*/
@@ -60,8 +103,8 @@
 
                 //Main case, with 2 numbers whole and part
                 if(parts.length == 2){
-                    const whole = parts[0];
-                    const fraction = parts[1];
+                    const whole = parts[0].trim();
+                    const fraction = parts[1].trim();
 
                     const wholeNum = frac(whole);
                     const fracParts = fraction.split(",");
@@ -306,6 +349,7 @@
                     daysInMonth = totalDays;
                 }
 
+
                 function print(){
                     let day = this.days
                     let month = monthArray[this.months];
@@ -318,7 +362,7 @@
             function time(str){
                 // Time format example: 29d 5h 15m 20s
 
-                const parts = str.split(/[ydhms]/);
+                const parts = str.split(/[ydhms]/).map( s => s.trim());
                 const quantities = [0,0,0,0,0];
 
                 const units = "ydhms".split("");
@@ -349,6 +393,40 @@
                 const time = 365*years + days + hours/24 + minutes/1440 + seconds/86400;
                 return time;
 
+            }
+
+            // Convert a decimal days to a time string
+            function time_string(number){
+                let str = "";
+                const days = Math.floor(number);
+
+                if(days != 0){
+                    str += days+"d ";
+                }
+                number -= days;
+                number *= 24;
+
+                const hours = Math.floor(number);
+                if(hours != 0){
+                    str += hours+"h ";
+                }
+                number -= hours;
+                number *= 60;
+
+                const minutes = Math.floor(number);
+                if(minutes != 0){
+                    str += minutes+"m ";
+                }
+                number -= minutes;
+                number *= 60;
+
+                const seconds = Math.floor(number);
+                if(seconds != 0){
+                    str += minutes+"s ";
+                }
+
+                return str;
+                
             }
 
 
@@ -432,13 +510,109 @@
             }
 
             // Rising Amplitude
-            function calculateRisingAmplitude(longestDay,declination){
-                const timeDegrees = longestDay*360;
+            function calculateRisingAmplitude(dayLength,declination){
+                const timeDegrees = dayLength*360;
 
                 const cos_ra = sin(90 + declination)*sin(timeDegrees/2);
                 const ra = 90 - asin(cos_ra);
                 return ra;
             }
+            function calculateLongestDayFromAmplitude(risingAmplitude,declination){
+                const half_sin_td = sin(90 - risingAmplitude)/sin(90 + declination);
+                const timeDegrees = 2*asin(half_sin_td);
+
+                const longestDay = timeDegrees/360;
+                return longestDay;
+            }
+
+            // Terrestrial Latitude
+            function calculateLatitudeFromLongestDay(longestDay,obliquity){
+                // Day cannot be longer than 24 hours
+                if(longestDay > 1 ||longestDay < 0) return NaN;
+
+                const timeDegrees = longestDay*360;
+                const num = sin(90 - obliquity)*sin(90 - timeDegrees/2); 
+                const den2 = 1 - Math.pow(sin(90 - obliquity)*sin(timeDegrees/2),2);
+                const den = Math.sqrt(den2);
+
+                const sin_lat = num/den;
+                const lat = -asin(sin_lat);
+                return lat;
+            }
+            function calculateLongestDayFromLatitude(latitude,obliquity){
+                const calcLat = (long) => calculateLatitudeFromLongestDay(long,obliquity);
+                return inverse(calcLat,latitude);
+            }
+
+            // Shadow Lengths
+            function calculateShadowLength(latitude,declination){
+                if(!declination) declination = 0;
+                const zenithAngle = declination + latitude;
+                if(Math.abs(zenithAngle) > 90) return Infinity*zenithAngle;
+                const length = sin(zenithAngle)/sin(90 - zenithAngle);
+                return length;
+            }
+            function calculateLatitudeFromShadow(length,declination){
+                //arc tan
+                const zenithAngle = asin(length/Math.sqrt(1+length**2));
+                const latitude = zenithAngle - declination;
+                return latitude;
+            }
+            function determineClimateZone(winterShadow, summerShadow){
+                if(winterShadow == -summerShadow){
+                    return "Equatorial Region (summer shadow equals winter shadow)";
+                }else if(Math.abs(winterShadow + summerShadow) < 0.15){ //Approximately equal
+                    return "Equatorial Region (summer shadow almost equal winter shadow)";
+                }else if(winterShadow*summerShadow < 0){
+                    return "Tropical Region (shadows go in both direction)";
+                }else if(winterShadow*summerShadow == Infinity){
+                    return "Arctic Region (shadows at noon get arbitrarly large)";
+                }else{
+                    return "Temperate Region (shadows in the same direction)";
+                }
+            }
+
+            // Oblique Ascensions
+             function calculateObliqueAscension(terrestrialLatitude,longitude,obliquity){
+                const num1 = sin(longitude)*sin(90 - obliquity);
+                const den1_sq = 1 - Math.pow(sin(longitude)*sin(obliquity),2);
+                den1 = Math.sqrt(den1_sq);
+
+                const num2 = sin(longitude)*sin(obliquity)*sin(terrestrialLatitude)/sin(90 + terrestrialLatitude);
+                const den2_sq = 1 - Math.pow(sin(longitude)*sin(obliquity),2)
+                const den2 = Math.sqrt(den2_sq);
+
+                let obliqueAscension = asin(num1/den1) - asin(num2/den2);
+
+                //Second quadrant
+                if(longitude > 90){
+                    obliqueAscension = 90 + obliqueAscension;
+                }else if(longitude > 180){
+                    obliqueAscension = 180 - obliqueAscension;
+                }else if(longitude > 270){
+                }
+                
+                if(obliqueAscension <0){
+                    obliqueAscension = 180 - obliqueAscension;
+                }
+
+                return obliqueAscension;
+             }
+
+             // Length of day and night
+             function calculateDaytimeLength(terrestrialLatitude,longitude,obliquity){
+                const sunOA = calculateObliqueAscension(terrestrialLatitude,longitude,obliquity);
+                const oppositeSunOA = calculateObliqueAscension(terrestrialLatitude,longitude+180,obliquity);
+
+                const rightAscension = calculateObliqueAscension(0,longitude,obliquity);
+                const obliqueAscension = calculateObliqueAscension(terrestrialLatitude,longitude,obliquity);
+
+                const ascensionalDifference = rightAscension - obliqueAscension;
+
+                const timeDegrees = 180 + 2*ascensionalDifference;
+                return timeDegrees/360;
+             }
+
 
              /* Display classes */
              function display(number,format){
@@ -447,6 +621,12 @@
                         if(options.base60chord){
                             number = number*60;
                         }
+                        break;
+                    case "time":
+                        if(options.timeHours){
+                            return time_string(number);
+                        }
+                        break;
                     case "number":
                     default:
                 }
@@ -457,7 +637,7 @@
                 }
              }
 
-            /*Input classes */
+                       /*Input classes */
             function input(number,format){
                 switch(format){
                     case "chord":
@@ -650,8 +830,131 @@
 
                     const ra = calculateRisingAmplitude(dayLength,declination);
                     document.querySelector("#rising-amplitude .amplitude").value = display(ra);
-
                 });
+                document.querySelector("#rising-amplitude .declination").addEventListener("change", function(e){
+                    const declination = sgd(e.target.value);
+                    const dayLength = time(document.querySelector("#rising-amplitude .day-length").value);
+
+                    const ra = calculateRisingAmplitude(dayLength,declination);
+                    document.querySelector("#rising-amplitude .amplitude").value = display(ra);
+                });
+                document.querySelector("#rising-amplitude .amplitude").addEventListener("change", function(e){
+                    const declination = sgd(document.querySelector("#rising-amplitude .declination").value);
+                    const ra = sgd(e.target.value);
+
+                    const dayLength = calculateLongestDayFromAmplitude(ra,declination);
+                    document.querySelector("#rising-amplitude .day-length").value = display(dayLength,"time");
+                });
+
+                // Terrestrial Latitude
+                document.querySelector("#terrestrial-latitude .longest-day").addEventListener("change", function(e){
+                    const longestDay = time(e.target.value);
+                    const obliquity = sgd(document.querySelector("#terrestrial-latitude .obliquity").value);
+
+                    const latitude = calculateLatitudeFromLongestDay(longestDay,obliquity);
+                    document.querySelector("#terrestrial-latitude .latitude").value = display(latitude);
+                });
+                document.querySelector("#terrestrial-latitude .latitude").addEventListener("change", function(e){
+                    const latitude = sgd(e.target.value); 
+                    const obliquity = sgd(document.querySelector("#terrestrial-latitude .obliquity").value);
+                    const longestDay = calculateLongestDayFromLatitude(latitude,obliquity);
+
+                    
+                    document.querySelector("#terrestrial-latitude .longest-day").value = display(longestDay,"time");
+                });
+
+                // Shadow Lengths
+                document.querySelector("#shadow-length .latitude").addEventListener("change", function(e){
+                    const latitude = sgd(e.target.value);
+                    const declination = sgd(document.querySelector("#shadow-length .declination").value);
+                    const obliquity = sgd(document.querySelector("#shadow-length .obliquity").value);
+
+                    document.querySelector("#shadow-length .length").value = display(calculateShadowLength(latitude,declination),"chord");
+                    document.querySelector("#shadow-length .winter").innerText = display(calculateShadowLength(latitude,-obliquity),"chord");
+                    document.querySelector("#shadow-length .equinox").innerText = display(calculateShadowLength(latitude,0),"chord");
+                    document.querySelector("#shadow-length .summer").innerText = display(calculateShadowLength(latitude,+obliquity),"chord");
+                    document.querySelector("#shadow-length .climata").innerText = determineClimateZone(calculateShadowLength(latitude,-obliquity),calculateShadowLength(latitude,obliquity));
+                });
+                document.querySelector("#shadow-length .declination").addEventListener("change", function(e){
+                    const declination = sgd(e.target.value);
+                    const latitude = sgd(document.querySelector("#shadow-length .latitude").value);
+                    const obliquity = sgd(document.querySelector("#shadow-length .obliquity").value);
+
+                    document.querySelector("#shadow-length .length").value = display(calculateShadowLength(latitude,declination),"chord");
+                });
+                document.querySelector("#shadow-length .length").addEventListener("change", function(e){
+                    const length = sgd(e.target.value);
+                    const declination = sgd(document.querySelector("#shadow-length .declination").value);
+                    
+
+                    document.querySelector("#shadow-length .latitude").value = display(calculateLatitudeFromShadow(length,declination));
+                });
+
+                // Oblique Ascensions
+                document.querySelectorAll("#oblique-ascension .ecliptic-longitude,.latitude").forEach(input => input.addEventListener("change", function(e){
+                    const eclipticLongitude = sgd(document.querySelector("#oblique-ascension .ecliptic-longitude").value);
+                    const latitude = sgd(document.querySelector("#oblique-ascension .latitude").value);
+                    const obliquity = sgd(document.querySelector("#oblique-ascension .obliquity").value);
+
+                    const oa = calculateObliqueAscension(latitude,eclipticLongitude,obliquity);
+                    document.querySelector("#oblique-ascension .oblique").value = display(oa);
+                }));
+
+                // Length of daytime and night
+                document.querySelectorAll("#day-night-length .ecliptic-longitude,.latitude").forEach(input => input.addEventListener("change", function(e){
+                    const eclipticLongitude = sgd(document.querySelector("#day-night-length .ecliptic-longitude").value);
+                    const latitude = sgd(document.querySelector("#day-night-length .latitude").value);
+                    const obliquity = sgd(document.querySelector("#day-night-length .obliquity").value);
+
+                    const dayLength = calculateDaytimeLength(latitude,eclipticLongitude,obliquity);
+                    document.querySelector("#day-night-length .daytime").value = display(dayLength,"time");
+                    document.querySelector("#day-night-length .nighttime").value = display(1 - dayLength,"time");
+                }));
+                document.querySelectorAll("#day-night-length .daytime,.nighttime").forEach(input => input.addEventListener("change", function(e){
+                    // Calculate night and daylength
+                    if(input.classList.contains("daytime")){
+                        document.querySelector("#day-night-length .nighttime").value = display(1- time(input.value), "time");
+                    }
+                    if(input.classList.contains("nighttime")){
+                        document.querySelector("#day-night-length .daytime").value = display(1 - time(input.value), "time");
+                    }
+
+                }));
+
+                // Conversion between hours
+                document.querySelectorAll("#day-night-length .hours").forEach(input => input.addEventListener("change", function(e){
+                    // Default to hours
+                    if(!isNaN(sgd(input.value))){
+                        input.value += "h";
+                    }
+
+                    // Use the longitude of the sun and observer latitude
+                    const eclipticLongitude = sgd(document.querySelector("#day-night-length .ecliptic-longitude").value);
+                    const latitude = sgd(document.querySelector("#day-night-length .latitude").value);
+                    const obliquity = sgd(document.querySelector("#day-night-length .obliquity").value);
+
+                    // Calculate length of day and night
+                    const dayLength = calculateDaytimeLength(latitude,eclipticLongitude,obliquity);
+                    const nightLength = 1 - dayLength;
+
+                    const dayHour = dayLength/12;
+                    const nightHour = nightLength/12;
+                    const equalHour = 1/24;
+
+                    if(input.classList.contains("day-hours")){
+                        document.querySelector("#day-night-length .night-hours").value = display((nightHour/dayHour)*time(input.value),"time");
+                        document.querySelector("#day-night-length .equal-hours").value = display((equalHour/dayHour)*time(input.value),"time");
+                    }
+                    if(input.classList.contains("night-hours")){
+                        document.querySelector("#day-night-length .day-hours").value = display((dayHour/nightHour)*time(input.value),"time");
+                        document.querySelector("#day-night-length .equal-hours").value = display((equalHour/nightHour)*time(input.value),"time");
+                    }
+                    if(input.classList.contains("equal-hours")){
+                        document.querySelector("#day-night-length .day-hours").value = display((dayHour/equalHour)*time(input.value),"time");
+                        document.querySelector("#day-night-length .night-hours").value = display((nightHour/equalHour)*time(input.value),"time");
+                    }
+                }));
+                
                 
 
 
@@ -695,14 +998,18 @@
 <body>
     <nav class="sidebar">
         <ul>
-          <li><a href="#sexagesimal">0.4a Sexagesimal</a></li>
-          <li><a href="#calendar">0.4d Calendar and Dates</a></li>
+          <li><a href="#sexagesimal">0.5a Sexagesimal</a></li>
+          <li><a href="#calendar">0.5d Calendar and Dates</a></li>
           <li><a href="#zodiac">0.7 Zodiac Signs to Ecliptic Longitude</a></li>
           <li><a href="#chords">1.11 Length of a chord (trigonometry)</a></li>
           <li><a href="#obliquity">1.12 Obliquity of the ecliptic</a></li>
           <li><a href="#declination">1.14 Declination of the sun</a></li>
           <li><a href="#right-ascension">1.16 Right ascension from Declination</a></li>
           <li><a href="#rising-amplitude">2.2 Rising Amplitude of the sun</a></li>
+          <li><a href="#terrestrial-latitude">2.3 Terrestrial Latitude from the Longest Day</a></li>
+          <li><a href="#shadow-length">2.5 Length of Shadows</a></li>
+          <li><a href="#oblique-ascension">2.7 Oblique Ascensions<a/></li>
+          <li><a href="#day-night-length">2.9 Length of night and daytime</a></li>
           <li><a href="#settings">Settings</a></li>
         </ul>
     </nav>
@@ -891,10 +1198,11 @@
         <section id="rising-amplitude">
            <h2> Rising Amplitude of the sun </h2> 
            <p>Determine the angle that the sun rises in relation to true east</p>
-           <label>Length of the longest day:</label>
+           <p class="explain">We can measure the length of the day using a clock.</p>
+           <label>Length of the day:</label>
            <input type="text" class="day-length">
            <br>
-           <label>Declination:</label>
+           <label>Declination of the sun:</label>
            <input type="text" class="declination">
            <br>
            <label>Rising Amplitude:</label>
@@ -902,6 +1210,98 @@
            <br>
         </section>
 
+        <section id="terrestrial-latitude">
+            <h2> Terrestrial Latitude from the Longest Day</h2>
+            <form>
+                <label>Length of Longest Day:</label>
+                <input type="text" class="longest-day">
+                <br>
+                <label> Latitude of the observer:</label>
+                <input type="text" class="latitude">
+                <details>
+                    <summary>More</summary>
+                    <label>Obliquity:</label> 
+                    <input type="text" class="obliquity" value="23;51,20">
+                </details>
+            </form>
+        </section>
+
+        <section id="shadow-length">
+            <h2> Length of Shadows at Noon </h2>
+            <p class="explain">A vertical rod placed in the ground is refered to a <em>gnomon</em>.</p>
+            <label>Terrestrial Latitude:</label>
+            <input type="text" class="latitude">
+            <br>
+            <label>Declination:</label>
+            <input type="text" class="declination">
+            <br>
+            <label>Length of shadow:</label>
+            <input type="text" class="length">
+            <br>
+            <h3> Longest and Shortest Shadows </h3>
+
+            at Winter Solstice: <span class="winter"></span><br>
+            at Summer Solstice: <span class="summer"></span><br>
+            at Equinox: <span class="equinox"></span><br>
+            Climate Zone: <span class="climata"></span>
+
+            <details>
+                <summary>More</summary>
+                <label>Obliquity</label>
+                <input type="text" class="obliquity" value="23;51,20"><br>
+            </details>
+
+        </section>
+
+        <section id="oblique-ascension">
+            <h2> Oblique Ascension </h2>
+           <label>Sun's Ecliptic Longitude:</label>
+           <input type="text" class="ecliptic-longitude">
+           <br>
+           <label>Terrestrial Latitude:</label>
+           <input type="text" class="latitude">
+           <br>
+           <label>Oblique Ascension:</label>
+           <input type="text" class="oblique">
+           <br>
+            <details>
+                <summary>More</summary>
+                <label>Obliquity</label>
+                <input type="text" class="obliquity" value="23;51,20"><br>
+            </details>
+        </section>
+        <section id="day-night-length">
+            <h2> Length of daytime and night hours </h2>
+           <label>Sun's Ecliptic Longitude:</label>
+           <input type="text" class="ecliptic-longitude">
+           <br>
+           <label>Terrestrial Latitude:</label>
+           <input type="text" class="latitude">
+           <br>
+           <label>Length of daytime:</label>
+           <input type="text" class="daytime">
+           <br>
+           <label>Length of night:</label>
+           <input type="text" class="nighttime">
+           <br>
+
+           <h3>Conversion between different hours</h3>
+           <label>Equal hours:</label>
+           <input type="text" class="equal-hours hours">
+           <br>
+           <label>Day hours:</label>
+           <input type="text" class="day-hours hours">
+           <br>
+           <label>Night hours:</label>
+           <input type="text" class="night-hours hours">
+           <br>
+
+            <details>
+                <summary>More</summary>
+                <label>Obliquity</label>
+                <input type="text" class="obliquity" value="23;51,20"><br>
+            </details>
+        </section>
         <section id="settings">
             <h2> Settings </h2>
             <form>
