@@ -4,11 +4,13 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Almagest Calculator</title>
+    
         <style>
         body{
             font-family: sans-serif;
             margin-bottom: 35vh;
             margin-left: 20px;
+            padding-top:40px;
         }
         .toggle-button{
             display:none;
@@ -26,6 +28,81 @@
             background: #ccc;
             border: 2px solid black;
         }
+
+        .sidebar button{
+            position:absolute;
+            z-index:1;
+            top:0;
+            left:0;
+        }
+        /* Initially hide sidebar ul*/
+        .sidebar ul{
+            display: none;
+            position: absolute;
+            background:white;
+            top: 0;
+            left:0;
+            padding:10px;
+            padding-top:60px;
+            list-style:none;
+        }
+
+        .sidebar ul a{
+            text-decoration: none;
+        }
+        .sidebar ul a:hover{
+            text-decoration: underline;
+            color: #53f;
+        }
+
+        .sidebar ul.sidebar-visible{
+            box-sizing: border-box;
+            display:block;
+            width:min(480px,100vw);
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+        }
+
+        input, select{
+            padding: 5px;
+            margin:5px;
+            border:0 solid #555;
+            border-bottom:1px solid #222;
+            color:#111;
+            caret-color: blue;
+        }
+        input{
+            width: 4ch;
+        }
+
+        button{
+            background:#eee;
+            transition: all 0.2s;
+            border:1px solid black;
+        }
+        button:active{
+            background-color:#dad;
+            transform:translateY(2px);
+            box-shadow:0 5px #999 inset;
+        }
+        button:hover{
+            background:#ddd;
+        }
+
+        input:focus{
+            outline: none;
+            border-bottom: 2px double #004;
+            transform: scale(1.05) translateY(2px);
+        }
+        input:focus-visible, select:focus-visible{
+            outline: double;
+            outline: none;
+        }
+
+        input[type=checkbox]{
+            opacity: 0.4;
+        }
+
         </style>
         <script>
             /* Adjustable settings */
@@ -286,6 +363,33 @@
                     }
                 }
                 return bestNum + "/" + bestDen;
+            }
+
+            // Convert to unicode fraction
+            function uniFrac(fraction){
+                // Special cases
+
+                const sups = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+                const slash ="⁄";
+                const subs = "₀₁₂₃₄₅₆₇₈₉";
+
+                //Convert fraction to unicode
+                const [m,n] = fraction.split("/");
+
+                return m.split("").map(l => sups[l]).join("") + slash + n.split("").map(l =>  subs[l]).join("");
+
+            }
+
+            // Convert unicode fraction to regular fraction
+            function fracUni(uniFrac){
+                const sups = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+                const slash ="⁄";
+                const subs = "₀₁₂₃₄₅₆₇₈₉";
+
+                //Convert unicode to fraction
+                const [m,n] = uniFrac.split(slash);
+
+                return m.split("").map(l => sups.indexOf(l)).join("") + "/" + n.split("").map(l =>  subs.indexOf(l)).join("");
             }
 
             // Convert roman numeral to decimal
@@ -549,8 +653,14 @@
 
             // Convert a decimal days to a time string
             function time_string(number){
+                let sign = Math.sign(number);
+                let sign_str = sign < 0 ? "-":"";
+                number *= sign;
+
                 let str = "";
                 const days = Math.floor(number);
+
+
 
                 if(days != 0){
                     str += days+"d ";
@@ -576,6 +686,8 @@
                 if(seconds != 0){
                     str += seconds+"s ";
                 }
+
+                str = sign_str + str;
 
                 return str;
                 
@@ -1108,6 +1220,74 @@
                 ctx.setLineDash([]);
              }
 
+
+             // Calculate parameters for epicycle model
+             function calculateEpicycleParameters(a1,a2,p1,p2){
+                const X = sin(p1)/sin((a1/2) + p1);
+                const Y = sin(p2)/sin((a2/2) + p2);
+                const Z = sin((a1+a2)/2);
+                const W = sin(90 - ((a1+a2)/2));
+
+                const dr = 2*Math.sqrt( (Z**2)  / ( (X - Y*W)**2 + (Y*Z)**2 ));
+
+                const a3 = 2*asin(dr*Y/2);
+
+                const pr = 2*sin((a2 - a3)/2);
+
+                const R = Math.sqrt(1 + dr*(dr + pr));
+
+                const radius = 1/R;
+
+                const um = (a2 + a3)/2;
+
+                const u = asin(pr/2);
+
+                const v = asin(dr*radius + radius*sin(u)); 
+
+                // Apogee at second observation
+                const apogee = 180 - u - v;
+
+                //Equation of anomaly at second observation
+                const eq = 90 - v;
+
+                return {
+                    radius,apogee,eq
+                }
+     
+             }
+
+             function Pt(){
+                // Tracing Ptolemy's exact procedure
+
+                const p1 = sgd("7;42");
+                const EZ = crd(2*p1);
+
+                const a1 = sgd("110;21");
+                const BE = crd(a1 - 2*p1);
+
+                const X = EZ/BE;
+
+                const p2 = sgd("6;21");
+                const EH = crd(2*p2);
+
+                const a2 = sgd("191;57");
+                const GE = crd(a2 - 2*p2);
+
+                const Y = EH/GE;
+
+                const GO = crd(a2 - a1);
+                const EO = crd(180 - (a2 - a1));
+
+                const xGO = GO*EH/2;
+                const xEO = EO*EH/2;
+
+                const xBO = 2*X - xEO;
+
+                const xBG =  Math.sqrt((xBO)**2 + (xGO)**2); 
+
+                console.log(dsg((1/X)*120));
+             }
+
              // Length of seasons
              const dataSunSeasonsLength = [];
 
@@ -1288,7 +1468,7 @@
                 document.querySelector("#chords .chord").addEventListener("change", function(e){
                     const chord = input(sgd(e.currentTarget.value),"chord");
                     document.querySelector("#chords .arc").value = display(arc(chord));
-                    drawChord(crd(arc))
+                    drawChord(arc(chord))
                 });
                 document.querySelector("#chords .arc").addEventListener("change", function(e){
                     const arc = sgd(e.currentTarget.value);
@@ -1381,7 +1561,6 @@
                     const latitude = sgd(e.target.value); 
                     const obliquity = sgd(document.querySelector("#terrestrial-latitude .obliquity").value);
                     const longestDay = calculateLongestDayFromLatitude(latitude,obliquity);
-
                     
                     document.querySelector("#terrestrial-latitude .longest-day").value = display(longestDay,"time");
                 });
@@ -1409,7 +1588,6 @@
                     const length = sgd(e.target.value);
                     const declination = sgd(document.querySelector("#shadow-length .declination").value);
                     
-
                     document.querySelector("#shadow-length .latitude").value = display(calculateLatitudeFromShadow(length,declination));
                 });
 
@@ -1764,7 +1942,61 @@
                     document.querySelector("#sun-position .equation").innerText = display(eq);
 
                 });
+                document.querySelector("#sun-position .mean-longitude-epoch").addEventListener("change", function(e){
+                    const apogee = sgd(document.querySelector("#sun-position .apogee").value);
+                    const meanLong = sgd(e.currentTarget.value);
+                    document.querySelector("#sun-position .mean-anomaly-epoch").value = display(angle(meanLong - apogee ));
+                });
+                document.querySelector("#sun-position .mean-anomaly-epoch").addEventListener("change", function(e){
+                    const apogee = sgd(document.querySelector("#sun-position .apogee").value);
+                    const meanAnom = sgd(e.currentTarget.value);
+                    document.querySelector("#sun-position .mean-longitude-epoch").value = display(angle(meanAnom + apogee ));
+                });
+                document.querySelector("#sun-position .apogee").addEventListener("change", function(e){
+                    const meanLong = sgd(document.querySelector("#sun-position .mean-longitude-epoch").value);
+                    const apogee = sgd(e.currentTarget.value);
+                    const maDom = document.querySelector("#sun-position .mean-anomaly-epoch");
+
+                    if(maDom.value != ""){
+                        maDom.value = display(meanLong - apogee);
+                    }
+                });
                 drawSunPosition(0,0);
+
+                // Calculate Equation of Time
+                document.querySelector("#equation-time form").addEventListener("change", function(e){
+                    const t1 = datetime(document.querySelector("#equation-time .time1").value);
+                    const t2 = datetime(document.querySelector("#equation-time .time2").value);
+
+                    // Parameters
+                    const apogee = sgd(document.querySelector("#equation-time .apogee").value);
+                    const eccentricity = input(sgd(document.querySelector("#equation-time .eccentricity").value),"chord");
+                    const yearLength = time(document.querySelector("#equation-time .year-length").value);
+
+                    const ma_epoch = sgd(document.querySelector("#equation-time .mean-anomaly-epoch").value);
+                    const mlong_epoch = sgd(document.querySelector("#equation-time .mean-longitude-epoch").value);
+
+                    const epoch = datetime(document.querySelector("#equation-time .epoch").value);
+                    const obliquity = sgd(document.querySelector("#equation-time .obliquity").value);
+
+                    const position1 = calculateSunPosition(t1,apogee,eccentricity,yearLength,ma_epoch,mlong_epoch,epoch);
+                    const position2 = calculateSunPosition(t2,apogee,eccentricity,yearLength,ma_epoch,mlong_epoch,epoch);
+
+                    const ra1 = calculateObliqueAscension(0,position1.longitude,obliquity);
+                    const ra2 = calculateObliqueAscension(0,position2.longitude,obliquity);
+
+                    const diff_ra = ra2 - ra1;
+                    const diff_long = position2.meanLongitude - position1.meanLongitude;
+
+                    const eqTime = (diff_ra - diff_long)/360;
+
+                    console.log(ra1,ra2,eqTime);
+
+                    document.querySelector("#equation-time .simple-interval").innerText = display(t2 - t1,"time");
+                    document.querySelector("#equation-time .equation-time").innerText = display(eqTime,"time");
+                    document.querySelector("#equation-time .accurate-interval").innerText = display(t2 - t1 + eqTime,"time");
+                });
+                
 
                 // Lunar Eclipse Periods
                 document.querySelector("#moon-period .eclipse-form").addEventListener("change", function(e){
@@ -1815,6 +2047,71 @@
                     document.querySelector("#moon-mean-motion .draconic-motion").value = display(calculateMeanMotion(t,latitude));
 
                 });
+                // Calculate Lunar Apogee and Eccentricity
+                document.querySelector("#moon-eccentricity .form-observe").addEventListener("change", function(e){
+                    // Times of each observation
+                    const t1 = datetime(document.querySelector("#moon-eccentricity .obv-1").value);
+                    const t2 = datetime(document.querySelector("#moon-eccentricity .obv-2").value);
+                    const t3 = datetime(document.querySelector("#moon-eccentricity .obv-3").value);
+
+                    // Month Length
+                    const anomalyMonth = time(document.querySelector("#moon-eccentricity .anomaly-month").value);
+                    const tropicalMonth = time(document.querySelector("#moon-eccentricity .tropical-month").value);
+
+                    // Parameters for the sun
+                    const apogee = sgd(document.querySelector("#moon-eccentricity .sun-apogee").value);
+                    const eccentricity = input(sgd(document.querySelector("#moon-eccentricity .sun-eccentricity").value),"chord");
+                    const yearLength = time(document.querySelector("#moon-eccentricity .year-length").value);
+
+                    const ma_epoch = sgd(document.querySelector("#moon-eccentricity .mean-anomaly-epoch").value);
+                    const mlong_epoch = sgd(document.querySelector("#moon-eccentricity .mean-longitude-epoch").value);
+
+                    const epoch = datetime(document.querySelector("#moon-eccentricity .epoch").value);
+
+                    //Position of the sun at each observation
+                    const s1 = calculateSunPosition(t1,apogee,eccentricity,yearLength,ma_epoch,mlong_epoch,epoch).longitude;
+                    const s2 = calculateSunPosition(t2,apogee,eccentricity,yearLength,ma_epoch,mlong_epoch,epoch).longitude;
+                    const s3 = calculateSunPosition(t3,apogee,eccentricity,yearLength,ma_epoch,mlong_epoch,epoch).longitude;
+
+                    //Longitude of the moon at each observation
+                    const m1 = angle(s1 - 180);
+                    const m2 = angle(s2 - 180);
+                    const m3 = angle(s3 - 180);
+                    
+                    console.log("motion in anomaly from second to third:",display(calculateMeanMotion(t3 - t2,anomalyMonth)));
+
+                    //Mean Motion in anomaly
+                    const a1 = calculateMeanMotion(t2 - t1,anomalyMonth)
+                    const a2 = calculateMeanMotion(t3 - t2,anomalyMonth)
+
+                    // Mean Motion in Longitude
+                    const l1 = calculateMeanMotion(t2 - t1,tropicalMonth)
+                    const l2 = calculateMeanMotion(t3 - t2,tropicalMonth)
+
+                    console.log("Mean motions:", a1, l1, a2 ,l2);
+
+                    //Equation of anomaly
+                    const p1 = angle(m2 - m1) - l1;
+                    const p2 = angle(m3 - m2) - l2;
+
+                    console.log("Equation of anomaly:", display(p1), display(p2));
+
+                    const params = calculateEpicycleParameters(a1,a2,p1,p2);
+
+                    const equation = calculateEquationOfAnomaly(90,params.radius);
+
+                    document.querySelector("#moon-eccentricity .sun-1").innerText = display(s1);
+                    document.querySelector("#moon-eccentricity .sun-2").innerText = display(s2);
+                    document.querySelector("#moon-eccentricity .sun-3").innerText = display(s3);
+                    document.querySelector("#moon-eccentricity .moon-1").innerText = display(m1);
+                    document.querySelector("#moon-eccentricity .moon-2").innerText = display(m2);
+                    document.querySelector("#moon-eccentricity .moon-3").innerText = display(m3);
+
+                    document.querySelector("#moon-eccentricity .apogee").innerText = display(angle(params.apogee));
+                    document.querySelector("#moon-eccentricity .eccentricity").innerText = display(params.radius,"chord"); 
+                    document.querySelector("#moon-eccentricity .greatest-equation").innerText = display(equation); 
+                    
+                });
 
                 // Prevent default submissions
                 document.querySelectorAll("form").forEach(form => {
@@ -1822,6 +2119,15 @@
                         e.preventDefault();
                         e.currentTarget.dispatchEvent(new Event("change"));
                     });
+                });
+
+                document.querySelector("main").addEventListener("mousedown", function(e){
+                    const sidebar = document.querySelector(".sidebar ul");
+                    sidebar.classList.remove("sidebar-visible");
+                });
+                document.querySelector("main").addEventListener("touchstop", function(e){
+                    const sidebar = document.querySelector(".sidebar ul");
+                    sidebar.classList.remove("sidebar-visible");
                 });
 
                 // Settings
@@ -1832,8 +2138,13 @@
 
             }
 
+
             function changeCalc(id){
                 const sections = document.querySelectorAll(".main section");
+
+                const sidebar = document.querySelector(".sidebar ul");
+                sidebar.classList.remove("sidebar-visible");
+
 
                 sections.forEach( section => {
                     if(section.id === id){
@@ -1842,6 +2153,29 @@
                         section.style.display = "none";
                     }
                 });
+
+                document.querySelectorAll("input").forEach(input => {
+                    ["input","focus"].forEach(event => {
+                        input.addEventListener(event, function(e){
+                            let ms = e.currentTarget.type == "number"?2:1;
+                            e.currentTarget.style.width = Math.max(4, this.value.length + ms ) + "ch";
+                        })
+                    })
+                });
+
+                setInterval( function inputLoop(){
+                    document.querySelectorAll("input").forEach(input => {
+                            let ms = input.type == "number"?2:1;
+                            input.style.width = Math.max(4, input.value.length + ms ) + "ch";
+                    });
+
+                    return inputLoop;
+                }(), 500);
+            }
+
+            function toggleSidebar(){
+                const sidebar = document.querySelector(".sidebar ul");
+                sidebar.classList.toggle("sidebar-visible");
             }
 
             // Determine current calculator by the url hash
@@ -1856,6 +2190,7 @@
 </head>
 <body>
     <nav class="sidebar">
+        <button onclick="toggleSidebar();"><img src="assets/toc.svg" alt="Content&gt;"></button>
         <ul>
           <li><a href="#sexagesimal">0.5a Sexagesimal</a></li>
           <li><a href="#calendar">0.5d Calendar and Dates</a></li>
@@ -1879,6 +2214,7 @@
           <li><a href="#equation-time">3.9 Equation of Time</a></li>
           <li><a href="#moon-period">4.2 Lunar periods</a></li>
           <li><a href="#moon-mean-motion">4.4 Lunar mean motions</a></li>
+          <li><a href="#moon-eccentricity">4.6 Lunar apogee and eccentricity</a></li>
 
           <li><a href="#settings">Settings</a></li>
         </ul>
@@ -2386,13 +2722,13 @@
               <label>Eccentricity:</label>
               <input type="text" class="eccentricity">
               <br>
-              <label>Longitude of Apogee:</label>
-              <input type="text" class="apogee">
-              <br>
               <label>Length of Year:</label>
               <input type="text" class="year-length">
               <br>
               <h4> Position at Epoch </h4>
+              <label>Longitude of Apogee:</label>
+              <input type="text" class="apogee">
+              <br>
               <label>Mean Longitude:</label>
               <input type="text" class="mean-longitude-epoch">
               <br>
@@ -2409,7 +2745,56 @@
             </details>
         </section>
         <section id="equation-time">
-            <h2> Equation Of Time </h2>
+            <h2> Equation of Time </h2>
+           <p class="explain">
+           For a given interval of two observations in true solar time, 
+           calculate the corresponding interval in mean solar time. The 
+           difference is the equation of time.
+           </p>
+
+           <form>
+           <label>Date/Time 1:</label>
+           <input type="text" class="time1">
+           <br>
+           <label>Date/Time 2:</label>
+           <input type="text" class="time2">
+           <br>
+           </form>
+
+           Interval (reckoned simply):<span class="simple-interval"></span><br>
+           Equation of time:<span class="equation-time"></span><br>
+           Interval (reckoned accurately):<span class="accurate-interval"></span><br>
+           <br>
+           <details>
+              <summary>Parameters</summary>
+              <h3> Sun Parameters </h3>
+              <label>Eccentricity:</label>
+              <input type="text" class="eccentricity">
+              <br>
+              <label>Length of Year:</label>
+              <input type="text" class="year-length">
+              <br>
+            <label>Obliquity</label>
+            <input type="text" class="obliquity" value="23;51,20"><br>
+              <h4> Position at Epoch </h4>
+              <label>Longitude of Apogee:</label>
+              <input type="text" class="apogee">
+              <br>
+              <label>Mean Longitude:</label>
+              <input type="text" class="mean-longitude-epoch">
+              <br>
+              <label>Mean Anomaly:</label>
+              <input type="text" class="mean-anomaly-epoch">
+
+              <h4> Epoch </h4>
+              <input type="checkbox" class="default-epoch" id="sun-position-epoch-default-9788345" checked>
+              <label for="sun-position-epoch-default-9788345">Choose default Nabonassar Epoch</label>
+              <br>
+
+              <label>Epoch:</label>
+              <input type="text" class="epoch" value="-746 Feb. 26">
+            </details>
+
         </section>
         <section id="moon-period">
             <h2> Lunar Eclipse Periods </h2>
@@ -2446,9 +2831,6 @@
             <h3> Month Lengths </h3>
             <label>Tropical Month:</label>
             <input type="text" class="tropical-month">
-            <br>
-            <label>Synodic Month:</label>
-            <input type="text" class="synodic-month">
             <br>
             <label>Anomalistic Month:</label>
             <input type="text" class="anomaly-month">
@@ -2504,6 +2886,77 @@
             <input type="text" class="draconic-motion">
             <br><br>
 
+        </section>
+        <section id="moon-eccentricity">
+            <h2> Moon's Apogee and Eccentricity From Three Observations </h2>
+
+            <h3> Date and Time of observations </h3>
+            <form class="form-observe">
+            <label>Observation 1: <label>
+            <input type="text" class="obv-1">
+            <br>
+            <label>Observation 2: <label>
+            <input type="text" class="obv-2">
+            <br>
+            <label>Observation 3: <label>
+            <input type="text" class="obv-3">
+            <br>
+            </form>
+
+            <h3> Ecliptic Longitude of the Moon and Sun at each eclipse observation</h3>
+            <p>First observation:</p>
+            <label>Sun:</label>
+            <span class="sun-1"></span><br>
+            <label>Moon:</label>
+            <span class="moon-1"></span><br>
+            <p>Second observation:</p>
+            <label>Sun:</label>
+            <span class="sun-2"></span><br>
+            <label>Moon:</label>
+            <span class="moon-2"></span><br>
+            <p>Third observation:</p>
+            <label>Sun:</label>
+            <span class="sun-3"></span><br>
+            <label>Moon:</label>
+            <span class="moon-3"></span><br><br>
+
+            Longitude of Apogee:<span class="apogee"></span> (at second observation) <br>
+            Eccentricity:<span class="eccentricity"></span><br>
+            Greatest Equation of Anomaly:<span class="greatest-equation"></span><br><br>
+            <details>
+              <summary>Parameters</summary>
+              <h3> Month Lengths </h3>
+              <label>Anomalistic Month:</label>
+              <input type="text" class="anomaly-month">
+              <br>
+              <label>Tropical Month:</label>
+              <input type="text" class="tropical-month">
+              <br>
+              <h3> Parameters for the sun </h3>
+              <label>Eccentricity:</label>
+              <input type="text" class="sun-eccentricity">
+              <br>
+              <label>Longitude of Apogee:</label>
+              <input type="text" class="sun-apogee">
+              <br>
+              <label>Length of Year:</label>
+              <input type="text" class="year-length">
+              <br>
+              <h4> Position at Epoch </h4>
+              <label>Mean Longitude:</label>
+              <input type="text" class="mean-longitude-epoch">
+              <br>
+              <label>Mean Anomaly:</label>
+              <input type="text" class="mean-anomaly-epoch">
+
+              <h4> Epoch </h4>
+              <input type="checkbox" class="default-epoch" id="sun-position-epoch-default-9788345" checked>
+              <label for="sun-position-epoch-default-9788345">Choose default Nabonassar Epoch</label>
+              <br>
+
+              <label>Epoch:</label>
+              <input type="text" class="epoch" value="-746 Feb. 26">
+            </details>
         </section>
 
         <section id="settings">
