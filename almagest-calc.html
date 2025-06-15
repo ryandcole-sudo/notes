@@ -123,6 +123,21 @@
                 return mod(a,360);
             }
 
+            function sign(number){
+                // Treat signed zeros as signed numbers
+                const s = Math.sign(number);
+
+                if(s === 0){
+                    if(Object.is(s,-0)){
+                        return -1;
+                    }else{
+                        return +1;
+                    }
+                }
+
+                return  s;
+            }
+
             function angleQuadrant(angle,quadrant){
                 // Place an angle in the given quadrant
                 if(quadrant == 1){
@@ -147,6 +162,38 @@
                 let y = m*x + c;
                 return y;
                 
+            }
+
+            // Traditional rounding
+            function round(number, prec = 0){
+                number = parseFloat(number);
+
+                if(prec === 0){
+                    return Math.round(number);
+                }
+
+                const numStr = number.toString();
+                if(numStr.indexOf("e") !== -1 || numStr.indexOf("E") !== - 1){
+                    number = +number.toFixed(16);
+                }
+                
+                const dp = numStr.indexOf(".");
+
+                if(dp ===  -1){
+                    return number;
+                }
+
+                const nextDig = parseInt(numStr.charAt(dp+prec+1));
+
+                const strArr = numStr.split("");
+
+                if(nextDig >= 5){
+                    strArr[dp + prec] = mod(+strArr[dp + prec] + 1,10);
+                }
+                
+                const newStr = strArr.join("").slice(0,dp + prec+1);
+                return +newStr;
+            
             }
 
             // Function to find the inverse of a given function with numerical output
@@ -243,15 +290,14 @@
                     const whole = parts[0].trim();
                     const fraction = parts[1].trim();
 
-
                     const wholeNum = frac(whole);
                     const fracParts = fraction.split(",");
-                    const sign = Math.sign(wholeNum);
+                    const sg = sign(wholeNum);
 
                     let fracNum = 0;
 
                     for(let i=0; i<fracParts.length;i++){
-                        fracNum += sign*frac(fracParts[i])*Math.pow(1/60,i+1);
+                        fracNum += sg*frac(fracParts[i])*Math.pow(1/60,i+1);
                     }
 
                     return wholeNum + fracNum;
@@ -269,8 +315,8 @@
                         let fracNum = 0;
                         
                         for(let i=0; i<numParts.length;i++){
-                            let sign = Math.sign(frac(numParts[0])*frac(numParts[i]));
-                            fracNum += sign*frac(numParts[i])*Math.pow(1/60,i+1);
+                            let sg = sign(frac(numParts[0])*frac(numParts[i]));
+                            fracNum += sg*frac(numParts[i])*Math.pow(1/60,i+1);
                         }
                         return fracNum;
                     }
@@ -279,49 +325,84 @@
             }
 
             //Convert decimal to sexagesimal
-            function dsg(number, prec){
-                if(!prec){
-                    prec = 3;
-                }
-                const  sign = Math.sign(number) === 1?"":"-";
+            function dsg(number, prec = 3) {
+                number = frac(number);
+                const sg = number < 0 ? "-" : "";
                 number = Math.abs(number);
-                const  whole = Math.floor(number);
-
+                
+                // Extract whole part
+                let whole = Math.floor(number);
+                let fraction = number - whole;
+                
                 const parts = [];
-
-                let fraction  = number - whole;
-
-                if(fraction != 0){
-                    for(let i = 0; i < prec-1; i++){
-                        fraction *= 60;
-                        const whole = Math.floor(fraction) 
-                        fraction = fraction - whole;
-
-                        parts.push(whole);
-
-                        if(fraction < Math.pow(1/60,prec+1)){
-                            break;
+                
+                if (fraction !== 0) {
+                    // Calculate all parts first, including one extra for rounding
+                    const tempParts = [];
+                    let tempFraction = fraction;
+                    
+                    for (let i = 0; i < prec; i++) {
+                        tempFraction *= 60;
+                        const part = Math.floor(tempFraction);
+                        tempParts.push(part);
+                        tempFraction = tempFraction - part;
+                    }
+                    
+                    // Check if we need to round up based on the next digit
+                    if (tempFraction * 60 >= 30) {
+                        // Round up - propagate carries
+                        let carry = 1;
+                        for (let i = tempParts.length - 1; i >= 0 && carry; i--) {
+                            tempParts[i] += carry;
+                            if (tempParts[i] >= 60) {
+                                tempParts[i] = 0;
+                                carry = 1;
+                            } else {
+                                carry = 0;
+                            }
+                        }
+                        
+                        // If carry propagated all the way up, increment whole part
+                        if (carry) {
+                            whole += 1;
                         }
                     }
+                    
+                    // Remove trailing zeros and copy to final parts array
+                    let lastNonZero = -1;
+                    for (let i = 0; i < tempParts.length; i++) {
+                        if (tempParts[i] !== 0) {
+                            lastNonZero = i;
+                        }
+                    }
+                    
+                    // Include all parts up to the last non-zero, or at least one part if all are zero
+                    const includeUpTo = lastNonZero >= 0 ? lastNonZero : 0;
+                    for (let i = 0; i <= includeUpTo; i++) {
+                        parts.push(tempParts[i]);
+                    }
                 }
-
-                if(parts.length == 0){
-                    return whole.toString();
+                
+                // Format output
+                if (parts.length === 0) {
+                    return sg + whole.toString();
                 }
-
-                const string = sign + whole + ";" + parts.join(",");
-                return string;
+                
+                return sg + whole + ";" + parts.join(",");
             }
 
             // Fractional numbers of the form 5 1/2
             function frac(number){
+                //Negative 0
+                if(Object.is(number,-0)){
+                    return -0;
+                }
+
                 if(typeof number !== "string"){
                     number =  String(number);
                 }
 
-
                 const parts = number.split(" ");
-
 
                 if(parts.length === 1){
                     // It might be a fraction or a whole number
@@ -335,10 +416,10 @@
                 }else if(parts.length === 2){
                     // Mixed numbers
                     const whole = Number(parts[0]);
-                    const sign = Math.sign(whole);
+                    const sg = sign(whole);
 
                     const [num, den] = parts[1].split("/").map(Number);
-                    return whole + sign*(num/den);
+                    return whole + sg*(num/den);
                 }else{
                     console.error("Invalid Fraction");
                     return NaN;
@@ -623,6 +704,10 @@
 
                 const units = "ydhms".split("");
 
+                //Sign
+                let sg = sign(parts[0]);
+                parts[0] = Math.abs(parts[0]);
+
                 // If no units given assume days
                 if(parts.length == 1){
                     return sgd(parts[0]);
@@ -647,20 +732,18 @@
                 const seconds = sgd(quantities[4]);
 
                 const time = 365*years + days + hours/24 + minutes/1440 + seconds/86400;
-                return time;
+                return sg*time;
 
             }
 
             // Convert a decimal days to a time string
-            function time_string(number){
+            function time_string(number, prec = 0){
                 let sign = Math.sign(number);
                 let sign_str = sign < 0 ? "-":"";
                 number *= sign;
 
                 let str = "";
                 const days = Math.floor(number);
-
-
 
                 if(days != 0){
                     str += days+"d ";
@@ -682,7 +765,7 @@
                 number -= minutes;
                 number *= 60;
 
-                const seconds = Math.floor(number);
+                const seconds = round(number,prec);
                 if(seconds != 0){
                     str += seconds+"s ";
                 }
@@ -1360,8 +1443,11 @@
                 });
 
                 // Sexagesimal calculator
-                document.querySelector("#sexagesimal .number").addEventListener("change", function(e){
-                    document.querySelector("#sexagesimal .result").innerText = sgd(e.currentTarget.value);
+                document.querySelector("#sexagesimal .decimal").addEventListener("change", function(e){
+                    document.querySelector("#sexagesimal .sexagesimal").value = dsg(e.currentTarget.value);
+                });
+                document.querySelector("#sexagesimal .sexagesimal").addEventListener("change", function(e){
+                    document.querySelector("#sexagesimal .decimal").value = sgd(e.currentTarget.value);
                 });
 
                 // For calendar and dates
@@ -1457,7 +1543,7 @@
 
                     const longitude = longEl.value;
 
-                    const sign = 30*Math.floor(Math.round(longitude)/30);
+                    const sign = 30*Math.floor(Math.round(angle(longitude))/30);
                     const degrees = mod(longitude,30);
 
                     signsEl.value = sign;
@@ -2223,9 +2309,11 @@
         <section class="section a-0" id="sexagesimal">
             <h2> Sexagesimal Calculator </h2>
             <form>
-                <input type="text" class="number">
-                <p class="result"></p>
-                <input type="submit" value="Enter"></input>
+                <label>Decimal:</label>
+                <input type="text" class="decimal">
+                <br>
+                <label>Sexagesimal:</label>
+                <input type="text" class="sexagesimal">
             </form>
         </section>
         <section id="calendar">
@@ -2829,6 +2917,9 @@
             <input type="text" class="draconic-ratio">
             <br>
             <h3> Month Lengths </h3>
+            <label>Synodic Month:</label>
+            <input type="text" class="synodic-month">
+            <br>
             <label>Tropical Month:</label>
             <input type="text" class="tropical-month">
             <br>
